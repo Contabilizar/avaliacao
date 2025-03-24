@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação - Contabilizar - Midian De Paula</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #000051;
+            --secondary: #e5e5e5;
+            --bg-light: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --spacing-unit: 1rem;
+            --border-radius: 1.5rem;
+            --header-height: 80px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-light); 
+            color: var(--primary); 
+            line-height: 1.6; 
+            padding-top: var(--header-height); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        .header { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            z-index: 1000; 
+            background: var(--primary); 
+            min-height: var(--header-height); 
+            border-bottom: 2px solid var(--bg-light); 
+            box-shadow: var(--shadow); 
+            display: flex; 
+            align-items: center; 
+        }
+        .header-content { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 calc(var(--spacing-unit) * 1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 100%; 
+        }
+        .logo { 
+            max-height: 60px; 
+            width: auto; 
+            object-fit: contain; 
+        }
+        .container { 
+            max-width: 450px; 
+            background: var(--bg-light); 
+            padding: calc(var(--spacing-unit) * 2); 
+            border-radius: var(--border-radius); 
+            box-shadow: var(--shadow); 
+            text-align: center; 
+        }
+        .employee-photo { 
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            margin: 0 auto calc(var(--spacing-unit) * 1); 
+            display: block; 
+            border: 3px solid var(--primary); 
+        }
+        .title { 
+            font-size: 2rem; 
+            font-weight: 700; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            background: linear-gradient(90deg, var(--primary), #003087); 
+            -webkit-background-clip: text; 
+            color: transparent; 
+        }
+        .subtitle { 
+            font-size: 1rem; 
+            color: #4b5563; 
+            margin-bottom: calc(var(--spacing-unit) * 2); 
+        }
+
+        /* Estilos do Carrossel */
+        .carousel { 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .carousel-slides { 
+            display: flex; 
+            transition: transform 0.5s ease; 
+            width: 100%; 
+        }
+        .carousel-slide { 
+            min-width: 100%; 
+            padding: calc(var(--spacing-unit) * 1); 
+            box-sizing: border-box; 
+        }
+        .carousel-slide h3 { 
+            font-size: 1.2rem; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            color: var(--primary); 
+        }
+        .answer-input { 
+            width: 100%; 
+            padding: calc(var(--spacing-unit) * 0.75); 
+            border: 1px solid var(--secondary); 
+            border-radius: 0.5rem; 
+            font-size: 1rem; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            transition: var(--transition); 
+        }
+        .answer-input:focus { 
+            border-color: var(--primary); 
+            outline: none; 
+        }
+        .carousel-nav { 
+            display: flex; 
+            justify-content: center; 
+            gap: 1rem; 
+            margin-top: calc(var(--spacing-unit) * 1); 
+        }
+        .carousel-nav button { 
+            background: var(--primary); 
+            color: #fff; 
+            padding: 0.5rem 1rem; 
+            border: none; 
+            border-radius: 0.5rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+        }
+        .carousel-nav button:disabled { 
+            background: #bdc3c7; 
+            cursor: not-allowed; 
+        }
+        .carousel-nav.hidden { 
+            display: none; 
+        }
+
+        /* Estilo do Slide de Agradecimento */
+        .thank-you-slide { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 200px; 
+        }
+        .thank-you-slide i { 
+            font-size: 3rem; 
+            color: #27ae60; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+        }
+        .thank-you-slide h3 { 
+            font-size: 1.5rem; 
+            color: var(--primary); 
+            margin-bottom: calc(var(--spacing-unit) * 0.5); 
+        }
+        .thank-you-slide p { 
+            font-size: 1rem; 
+            color: #4b5563; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+        }
+        .thank-you-slide button { 
+            background: var(--primary); 
+            color: #fff; 
+            padding: 0.5rem 1rem; 
+            border: none; 
+            border-radius: 0.5rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+        }
+        .thank-you-slide button:hover { 
+            background: #003087; 
+        }
+
+        /* Estilos da Avaliação */
+        .rating-section { 
+            display: none; 
+        }
+        .rating { 
+            display: flex; 
+            justify-content: center; 
+            margin-bottom: calc(var(--spacing-unit) * 2); 
+        }
+        .rating input { 
+            display: none; 
+        }
+        .rating label { 
+            font-size: 2rem; 
+            color: var(--secondary); 
+            cursor: pointer; 
+            transition: var(--transition); 
+        }
+        .rating label:hover,
+        .rating input:checked ~ label,
+        .rating label:hover ~ label { 
+            color: #f1c40f; 
+        }
+        textarea { 
+            width: 100%; 
+            height: 100px; 
+            padding: calc(var(--spacing-unit) * 0.75); 
+            border: 1px solid var(--secondary); 
+            border-radius: 0.5rem; 
+            resize: none; 
+            font-size: 1rem; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            box-sizing: border-box; 
+            transition: var(--transition); 
+        }
+        textarea:focus { 
+            border-color: var(--primary); 
+            outline: none; 
+        }
+        button { 
+            background: var(--primary); 
+            color: #fff; 
+            padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5); 
+            border: none; 
+            border-radius: 0.5rem; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            width: 100%; 
+        }
+        button:hover { 
+            background: #003087; 
+        }
+        button:disabled { 
+            background: #bdc3c7; 
+            cursor: not-allowed; 
+        }
+        .success { 
+            color: #27ae60; 
+            margin-top: calc(var(--spacing-unit) * 0.5); 
+            display: none; 
+            font-size: 0.9rem; 
+        }
+
+        @media (max-width: 767px) {
+            .header { min-height: 60px; }
+            body { padding-top: 60px; }
+            .container { padding: calc(var(--spacing-unit) * 1); }
+            .title { font-size: 1.5rem; }
+            .subtitle { font-size: 0.9rem; }
+            .rating label { font-size: 1.5rem; }
+            .employee-photo { width: 60px; height: 60px; }
+            .carousel-slide h3 { font-size: 1rem; }
+            .answer-input { font-size: 0.9rem; padding: 0.4rem; }
+            .thank-you-slide h3 { font-size: 1.2rem; }
+            .thank-you-slide p { font-size: 0.9rem; }
+            .thank-you-slide i { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="logo.png" alt="Logo Contabilizar" class="logo">
+        </div>
+    </header>
+    <div class="container">
+        <img src="midian.jpg" alt="Foto de Midian De Paula" class="employee-photo">
+        <h1 class="title">Avalie Nosso Atendimento</h1>
+        <p class="subtitle">Midian De Paula - Departamento Fiscal</p>
+
+        <!-- Carrossel de Perguntas -->
+        <div class="carousel" id="carousel">
+            <div class="carousel-slides" id="carouselSlides">
+                <div class="carousel-slide">
+                    <h3>O seu problema foi resolvido de forma satisfatória?</h3>
+                    <input type="text" class="answer-input" id="q1" placeholder="Digite sua resposta">
+                </div>
+                <div class="carousel-slide">
+                    <h3>A solução foi entregue em um tempo adequado?</h3>
+                    <input type="text" class="answer-input" id="q2" placeholder="Digite sua resposta">
+                </div>
+                <div class="carousel-slide">
+                    <h3>O retorno do atendente foi rápido e eficiente?</h3>
+                    <input type="text" class="answer-input" id="q3" placeholder="Digite sua resposta">
+                </div>
+                <div class="carousel-slide">
+                    <h3>O atendimento foi cordial e respeitoso?</h3>
+                    <input type="text" class="answer-input" id="q4" placeholder="Digite sua resposta">
+                </div>
+                <div class="carousel-slide">
+                    <h3>O atendente demonstrou conhecimento para resolver sua solicitação?</h3>
+                    <input type="text" class="answer-input" id="q5" placeholder="Digite sua resposta">
+                </div>
+                <!-- Slide de Agradecimento -->
+                <div class="carousel-slide thank-you-slide">
+                    <i class="fas fa-heart"></i>
+                    <h3>Obrigado pela sua avaliação!</h3>
+                    <p>Sua opinião é muito importante para nós. Agradecemos por dedicar seu tempo para nos ajudar a melhorar nosso atendimento e oferecer um serviço cada vez melhor!</p>
+                    <button id="restartBtn">Avaliar Novamente</button>
+                </div>
+            </div>
+            <div class="carousel-nav" id="carouselNav">
+                <button id="prevBtn" disabled>Voltar</button>
+                <button id="nextBtn" disabled>Próximo</button>
+            </div>
+        </div>
+
+        <!-- Seção de Avaliação com Estrelas e Comentários -->
+        <div class="rating-section" id="ratingSection">
+            <h3>Qual a sua nota geral para o atendimento?</h3>
+            <div class="rating">
+                <input type="radio" id="star5" name="nota" value="5" required><label for="star5">★</label>
+                <input type="radio" id="star4" name="nota" value="4"><label for="star4">★</label>
+                <input type="radio" id="star3" name="nota" value="3"><label for="star3">★</label>
+                <input type="radio" id="star2" name="nota" value="2"><label for="star2">★</label>
+                <input type="radio" id="star1" name="nota" value="1"><label for="star1">★</label>
+            </div>
+            <textarea id="comentario" placeholder="Deixe seu comentário (opcional)"></textarea>
+            <button id="submitBtn">Enviar Avaliação</button>
+            <p class="success" id="successMsg">Avaliação enviada com sucesso!</p>
+        </div>
+    </div>
+
+    <script>
+        // Lógica do Carrossel
+        const slides = document.querySelectorAll('.carousel-slide');
+        const slidesContainer = document.getElementById('carouselSlides');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const carouselNav = document.getElementById('carouselNav');
+        const carousel = document.getElementById('carousel');
+        const ratingSection = document.getElementById('ratingSection');
+        const restartBtn = document.getElementById('restartBtn');
+        let currentSlide = 0;
+
+        // Função para atualizar o carrossel
+        function updateCarousel() {
+            console.log(`Atualizando carrossel. Slide atual: ${currentSlide}`);
+            slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = !isSlideAnswered(currentSlide);
+            if (currentSlide === slides.length - 1) {
+                console.log("Exibindo slide de agradecimento. Escondendo navegação.");
+                carouselNav.classList.add('hidden');
+            } else {
+                console.log("Mostrando navegação.");
+                carouselNav.classList.remove('hidden');
+                if (currentSlide === slides.length - 2 && isSlideAnswered(currentSlide)) {
+                    nextBtn.textContent = 'Finalizar';
+                } else {
+                    nextBtn.textContent = 'Próximo';
+                }
+            }
+        }
+
+        // Verifica se a pergunta atual foi respondida
+        function isSlideAnswered(slideIndex) {
+            if (slideIndex === slides.length - 1) {
+                console.log("Slide de agradecimento, não precisa de resposta.");
+                return true; // Slide de agradecimento não precisa de resposta
+            }
+            const slide = slides[slideIndex];
+            const input = slide.querySelector('.answer-input');
+            const answered = input.value.trim() !== '';
+            console.log(`Pergunta ${slideIndex + 1} respondida: ${answered}`);
+            return answered;
+        }
+
+        // Habilita o botão "Próximo" quando o usuário digita algo
+        slides.forEach((slide, index) => {
+            if (index === slides.length - 1) return; // Ignora o slide de agradecimento
+            const input = slide.querySelector('.answer-input');
+            input.addEventListener('input', () => {
+                if (currentSlide === index) {
+                    console.log(`Input na pergunta ${index + 1}. Resposta: ${input.value}`);
+                    nextBtn.disabled = !isSlideAnswered(currentSlide);
+                }
+            });
+        });
+
+        // Navegação do carrossel
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                console.log("Clicou em Voltar.");
+                updateCarousel();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 2) {
+                currentSlide++;
+                console.log("Clicou em Próximo.");
+                updateCarousel();
+            } else if (currentSlide === slides.length - 2 && isSlideAnswered(currentSlide)) {
+                console.log("Clicou em Finalizar. Mostrando seção de avaliação.");
+                carousel.style.display = 'none';
+                ratingSection.style.display = 'block';
+            }
+        });
+
+        // Reinicia o carrossel
+        restartBtn.addEventListener('click', () => {
+            console.log("Clicou em Avaliar Novamente. Reiniciando carrossel.");
+            currentSlide = 0;
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`q${i}`).value = '';
+            }
+            updateCarousel();
+        });
+
+        // Inicializa o carrossel
+        updateCarousel();
+
+        // Lógica de envio da avaliação
+        const funcionarioId = "midian_de_paula";
+        const form = document.getElementById('ratingSection');
+        const successMsg = document.getElementById('successMsg');
+
+        document.getElementById('submitBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const nota = document.querySelector('input[name="nota"]:checked')?.value;
+            const comentario = document.getElementById('comentario').value;
+
+            // Coleta as respostas das perguntas
+            const respostas = {};
+            for (let i = 1; i <= 5; i++) {
+                const resposta = document.getElementById(`q${i}`).value.trim();
+                respostas[`pergunta${i}`] = resposta || '';
+            }
+
+            if (!nota) {
+                alert('Por favor, selecione uma nota geral.');
+                return;
+            }
+
+            // Simulação de envio (próximo passo: Firebase)
+            console.log({
+                funcionario: funcionarioId,
+                respostas: respostas,
+                nota: nota,
+                comentario: comentario,
+                data: new Date().toISOString()
+            });
+
+            // Feedback visual
+            console.log("Enviando avaliação...");
+            document.getElementById('submitBtn').disabled = true;
+            successMsg.style.display = 'block';
+
+            setTimeout(() => {
+                console.log("Avaliação enviada. Preparando para mostrar o slide de agradecimento...");
+                form.reset();
+                document.getElementById('submitBtn').disabled = false;
+                successMsg.style.display = 'none';
+
+                // Garante que o carrossel está visível e a seção de avaliação está escondida
+                ratingSection.style.display = 'none';
+                carousel.style.display = 'block';
+
+                // Move para o slide de agradecimento
+                currentSlide = slides.length - 1;
+                console.log(`Definindo currentSlide para ${currentSlide} (slide de agradecimento).`);
+                updateCarousel();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
