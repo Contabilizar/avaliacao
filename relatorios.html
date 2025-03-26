@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios Mensais - Contabilizar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #000051;
+            --secondary: #e5e5e5;
+            --bg-light: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --spacing-unit: 1rem;
+            --border-radius: 1.5rem;
+            --header-height: 80px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-light); 
+            color: var(--primary); 
+            line-height: 1.6; 
+            padding-top: var(--header-height); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        .header { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            z-index: 1000; 
+            background: var(--primary); 
+            min-height: var(--header-height); 
+            border-bottom: 2px solid var(--bg-light); 
+            box-shadow: var(--shadow); 
+            display: flex; 
+            align-items: center; 
+        }
+        .header-content { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 calc(var(--spacing-unit) * 1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            width: 100%; 
+        }
+        .logo { 
+            max-height: 60px; 
+            width: auto; 
+            object-fit: contain; 
+        }
+        .user-info { 
+            color: #fff; 
+            font-size: 1rem; 
+        }
+        .logout-btn { 
+            background: #e74c3c; 
+            color: #fff; 
+            padding: 0.5rem 1rem; 
+            border: none; 
+            border-radius: 0.5rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+        }
+        .logout-btn:hover { 
+            background: #c0392b; 
+        }
+        .container { 
+            max-width: 600px; 
+            width: 90%; 
+            background: var(--bg-light); 
+            padding: calc(var(--spacing-unit) * 2); 
+            border-radius: var(--border-radius); 
+            box-shadow: var(--shadow); 
+            text-align: center; 
+            margin: 0 auto; 
+        }
+        .title { 
+            font-size: 2rem; 
+            font-weight: 700; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            background: linear-gradient(90deg, var(--primary), #003087); 
+            -webkit-background-clip: text; 
+            color: transparent; 
+        }
+        .subtitle { 
+            font-size: 1rem; 
+            color: #4b5563; 
+            margin-bottom: calc(var(--spacing-unit) * 2); 
+        }
+        .report-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: calc(var(--spacing-unit) * 2); 
+        }
+        .report-table th, .report-table td { 
+            padding: calc(var(--spacing-unit) * 0.75); 
+            border: 1px solid var(--secondary); 
+            text-align: left; 
+        }
+        .report-table th { 
+            background: var(--primary); 
+            color: #fff; 
+        }
+        .report-table tr:nth-child(even) { 
+            background: #f9f9f9; 
+        }
+        @media (max-width: 767px) {
+            :root {
+                --spacing-unit: 0.75rem;
+            }
+            .header { 
+                min-height: 50px;
+            }
+            body { 
+                padding-top: 50px;
+            }
+            .container { 
+                padding: calc(var(--spacing-unit) * 1);
+                width: 95%;
+            }
+            .logo { 
+                max-height: 40px;
+            }
+            .user-info { 
+                font-size: 0.85rem;
+            }
+            .logout-btn { 
+                font-size: 0.85rem;
+                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            }
+            .title { 
+                font-size: 1.5rem;
+            }
+            .subtitle { 
+                font-size: 0.85rem;
+                margin-bottom: calc(var(--spacing-unit) * 1);
+            }
+            .report-table th, .report-table td { 
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="logo.png" alt="Logo Contabilizar" class="logo">
+            <div class="user-info">
+                <span id="userName"></span> | <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <h1 class="title">Relatórios Mensais</h1>
+        <p class="subtitle">Média de notas por funcionário no último mês</p>
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Funcionário</th>
+                    <th>Média de Notas</th>
+                    <th>Número de Avaliações</th>
+                </tr>
+            </thead>
+            <tbody id="reportTableBody"></tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        // Importa os módulos do Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getFirestore, collection, getDocs, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNidw_VCAVleo0UxTzVkqQhEYXfshB5tk",
+            authDomain: "avaliacao-contabilizar.firebaseapp.com",
+            projectId: "avaliacao-contabilizar",
+            storageBucket: "avaliacao-contabilizar.firebasestorage.app",
+            messagingSenderId: "934194892065",
+            appId: "1:934194892065:web:f8654e039343b38ee38260"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Verifica se o usuário está logado e é administrador
+        const userId = localStorage.getItem('userId');
+        const userCargo = localStorage.getItem('userCargo');
+        const userNome = localStorage.getItem('userNome');
+
+        if (!userId || !userCargo || !userNome || userCargo !== 'administrador') {
+            window.location.href = 'login.html'; // Alterado de gerar_link.html para login.html
+        }
+
+        // Exibe o nome do usuário
+        document.getElementById('userName').textContent = userNome;
+
+        // Função para carregar relatórios
+        async function carregarRelatorios() {
+            const reportTableBody = document.getElementById('reportTableBody');
+            reportTableBody.innerHTML = '';
+
+            // Obtém todos os funcionários
+            const funcionariosSnapshot = await getDocs(collection(db, 'funcionarios'));
+            const lastMonth = new Date();
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+            for (const funcionarioDoc of funcionariosSnapshot.docs) {
+                const funcionarioId = funcionarioDoc.id;
+                const funcionarioData = funcionarioDoc.data();
+                const nome = funcionarioData.nome;
+
+                // Obtém as avaliações do último mês
+                const avaliacoesRef = collection(db, `avaliacoes/empresas`);
+                const empresasSnapshot = await getDocs(avaliacoesRef);
+
+                let totalNotas = 0;
+                let totalAvaliacoes = 0;
+
+                for (const empresaDoc of empresasSnapshot.docs) {
+                    const empresaId = empresaDoc.id;
+                    const avaliacoesQuery = query(
+                        collection(db, `avaliacoes/empresas/${empresaId}/funcionarios/${funcionarioId}/avaliacoes`),
+                        where('data', '>=', lastMonth.toISOString())
+                    );
+                    const avaliacoesSnapshot = await getDocs(avaliacoesQuery);
+
+                    avaliacoesSnapshot.forEach((avaliacaoDoc) => {
+                        const avaliacaoData = avaliacaoDoc.data();
+                        totalNotas += avaliacaoData.nota;
+                        totalAvaliacoes++;
+                    });
+                }
+
+                const media = totalAvaliacoes > 0 ? (totalNotas / totalAvaliacoes).toFixed(2) : 'N/A';
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${nome}</td>
+                    <td>${media}</td>
+                    <td>${totalAvaliacoes}</td>
+                `;
+                reportTableBody.appendChild(row);
+            }
+        }
+
+        // Função de logout
+        window.logout = function () {
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userCargo');
+            localStorage.removeItem('userNome');
+            window.location.href = 'login.html'; // Alterado de gerar_link.html para login.html
+        };
+
+        // Carrega os relatórios ao iniciar a página
+        carregarRelatorios();
+    </script>
+</body>
+</html>

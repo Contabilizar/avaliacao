@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Link de Avaliação - Contabilizar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #000051;
+            --secondary: #e5e5e5;
+            --bg-light: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --spacing-unit: 1rem;
+            --border-radius: 1.5rem;
+            --header-height: 80px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-light); 
+            color: var(--primary); 
+            line-height: 1.6; 
+            padding-top: var(--header-height); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        .header { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            z-index: 1000; 
+            background: var(--primary); 
+            min-height: var(--header-height); 
+            border-bottom: 2px solid var(--bg-light); 
+            box-shadow: var(--shadow); 
+            display: flex; 
+            align-items: center; 
+        }
+        .header-content { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 calc(var(--spacing-unit) * 1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            width: 100%; 
+        }
+        .logo { 
+            max-height: 60px; 
+            width: auto; 
+            object-fit: contain; 
+        }
+        .user-info { 
+            color: #fff; 
+            font-size: 1rem; 
+        }
+        .logout-btn { 
+            background: #e74c3c; 
+            color: #fff; 
+            padding: 0.5rem 1rem; 
+            border: none; 
+            border-radius: 0.5rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+        }
+        .logout-btn:hover { 
+            background: #c0392b; 
+        }
+        .container { 
+            max-width: 450px; 
+            width: 90%; 
+            background: var(--bg-light); 
+            padding: calc(var(--spacing-unit) * 2); 
+            border-radius: var(--border-radius); 
+            box-shadow: var(--shadow); 
+            text-align: center; 
+            margin: 0 auto; 
+        }
+        .title { 
+            font-size: 2rem; 
+            font-weight: 700; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            background: linear-gradient(90deg, var(--primary), #003087); 
+            -webkit-background-clip: text; 
+            color: transparent; 
+        }
+        .subtitle { 
+            font-size: 1rem; 
+            color: #4b5563; 
+            margin-bottom: calc(var(--spacing-unit) * 2); 
+        }
+        .section { 
+            margin-bottom: calc(var(--spacing-unit) * 2); 
+        }
+        .section h3 { 
+            font-size: 1.2rem; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            color: var(--primary); 
+        }
+        .section input, .section select { 
+            width: 100%; 
+            padding: calc(var(--spacing-unit) * 0.75); 
+            border: 1px solid var(--secondary); 
+            border-radius: 0.5rem; 
+            font-size: 1rem; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            transition: var(--transition); 
+        }
+        .section input:focus, .section select:focus { 
+            border-color: var(--primary); 
+            outline: none; 
+        }
+        .section button { 
+            background: var(--primary); 
+            color: #fff; 
+            padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5); 
+            border: none; 
+            border-radius: 0.5rem; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            width: 100%; 
+        }
+        .section button:hover { 
+            background: #003087; 
+        }
+        .section button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        #linkOutput { 
+            margin-top: calc(var(--spacing-unit) * 1); 
+            padding: calc(var(--spacing-unit) * 0.75); 
+            border: 1px solid var(--secondary); 
+            border-radius: 0.5rem; 
+            background: #f9f9f9; 
+            word-wrap: break-word; 
+            text-align: center; 
+        }
+        .link-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        #linkOutput a { 
+            color: var(--primary); 
+            text-decoration: none;
+            flex-grow: 1;
+            overflow-wrap: break-word;
+        }
+        #linkOutput a:hover { 
+            text-decoration: underline; 
+        }
+        #copyButton {
+            background: var(--primary);
+            color: #fff;
+            padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        #copyButton:hover {
+            background: #003087;
+        }
+        .success { 
+            color: #27ae60; 
+            margin-top: calc(var(--spacing-unit) * 0.5); 
+            display: none; 
+            font-size: 0.9rem; 
+        }
+        .search-container {
+            position: relative;
+            margin-bottom: calc(var(--spacing-unit) * 1);
+            display: none; /* Inicialmente escondido */
+        }
+        #searchInput {
+            padding-left: 2.5rem;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>') no-repeat 0.75rem center;
+            background-size: 1rem;
+        }
+        @media (max-width: 767px) {
+            :root {
+                --spacing-unit: 0.75rem;
+            }
+            .header { 
+                min-height: 50px;
+            }
+            body { 
+                padding-top: 50px;
+            }
+            .container { 
+                padding: calc(var(--spacing-unit) * 1);
+                width: 95%;
+            }
+            .logo { 
+                max-height: 40px;
+            }
+            .user-info { 
+                font-size: 0.85rem;
+            }
+            .logout-btn { 
+                font-size: 0.85rem;
+                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            }
+            .title { 
+                font-size: 1.5rem;
+            }
+            .subtitle { 
+                font-size: 0.85rem;
+                margin-bottom: calc(var(--spacing-unit) * 1);
+            }
+            .section h3 { 
+                font-size: 1rem;
+                margin-bottom: calc(var(--spacing-unit) * 0.75);
+            }
+            .section input, .section select { 
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5);
+                margin-bottom: calc(var(--spacing-unit) * 0.75);
+            }
+            .section button { 
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            }
+            #linkOutput { 
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5);
+            }
+            #copyButton {
+                font-size: 0.8rem;
+                padding: calc(var(--spacing-unit) * 0.3) calc(var(--spacing-unit) * 0.6);
+            }
+            .success { 
+                font-size: 0.8rem;
+            }
+            #searchInput {
+                padding-left: 2rem;
+                background-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="logo.png" alt="Logo Contabilizar" class="logo">
+            <div class="user-info">
+                <span id="userName"></span> | <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <h1 class="title">Gerar Link de Avaliação</h1>
+        <p class="subtitle">Crie links para avaliar seu atendimento</p>
+
+        <!-- Seção para cadastrar novo cliente -->
+        <div class="section">
+            <h3>Cadastrar Novo Cliente</h3>
+            <input type="text" id="clienteEmpresa" placeholder="Nome da Empresa">
+            <input type="text" id="clienteNome" placeholder="Nome do Cliente">
+            <button onclick="cadastrarCliente()">Adicionar Cliente</button>
+            <p class="success" id="clienteSuccessMsg">Cliente cadastrado com sucesso!</p>
+        </div>
+
+        <!-- Seção para gerar link -->
+        <div class="section">
+            <h3>Gerar Link</h3>
+            <div class="search-container" id="searchContainer">
+                <input type="text" id="searchInput" placeholder="Buscar empresa ou cliente...">
+            </div>
+            <select id="empresaSelect">
+                <option value="">Selecione uma Empresa</option>
+            </select>
+            <select id="clienteSelect" disabled>
+                <option value="">Selecione um Cliente</option>
+            </select>
+            <button id="gerarLinkBtn" disabled onclick="gerarLink()">Gerar Link</button>
+            <div id="linkOutput"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Importa os módulos do Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getFirestore, collection, doc, setDoc, getDocs, getDoc, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNidw_VCAVleo0UxTzVkqQhEYXfshB5tk",
+            authDomain: "avaliacao-contabilizar.firebaseapp.com",
+            projectId: "avaliacao-contabilizar",
+            storageBucket: "avaliacao-contabilizar.firebasestorage.app",
+            messagingSenderId: "934194892065",
+            appId: "1:934194892065:web:f8654e039343b38ee38260"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Verifica se o usuário está logado
+        const userId = localStorage.getItem('userId');
+        const userCargo = localStorage.getItem('userCargo');
+        const userNome = localStorage.getItem('userNome');
+
+        if (!userId || !userCargo || !userNome) {
+            window.location.href = 'login.html';
+        }
+
+        // Exibe o nome do usuário
+        document.getElementById('userName').textContent = userNome;
+
+        // Variáveis globais para armazenar os dados
+        let empresas = [];
+        let clientesPorEmpresa = {};
+
+        // Função para carregar todas as empresas
+        async function carregarEmpresas() {
+            empresas = [];
+            clientesPorEmpresa = {};
+            const empresaSelect = document.getElementById('empresaSelect');
+            empresaSelect.innerHTML = '<option value="">Selecione uma Empresa</option>';
+
+            const empresasQuery = query(collection(db, 'clientes'), orderBy('nome'));
+            const empresasSnapshot = await getDocs(empresasQuery);
+
+            for (const empresaDoc of empresasSnapshot.docs) {
+                const empresaId = empresaDoc.id;
+                const empresaNome = empresaDoc.data().nome;
+                empresas.push({ id: empresaId, nome: empresaNome });
+
+                // Carrega os clientes dessa empresa
+                const clientesQuery = query(collection(db, `clientes/${empresaId}/clientes`), orderBy('nome'));
+                const clientesSnapshot = await getDocs(clientesQuery);
+                clientesPorEmpresa[empresaId] = [];
+
+                clientesSnapshot.forEach((clienteDoc) => {
+                    const clienteId = clienteDoc.id;
+                    const clienteNome = clienteDoc.data().nome;
+                    clientesPorEmpresa[empresaId].push({ id: clienteId, nome: clienteNome });
+                });
+
+                const option = document.createElement('option');
+                option.value = empresaId;
+                option.textContent = empresaNome;
+                empresaSelect.appendChild(option);
+            }
+
+            // Atualiza o dropdown com base no filtro de busca
+            filtrarEmpresasEClientes();
+        }
+
+        // Função para carregar os clientes de uma empresa selecionada
+        function carregarClientes(empresaId) {
+            const clienteSelect = document.getElementById('clienteSelect');
+            clienteSelect.innerHTML = '<option value="">Selecione um Cliente</option>';
+            clienteSelect.disabled = !empresaId;
+
+            if (empresaId && clientesPorEmpresa[empresaId]) {
+                const clientes = clientesPorEmpresa[empresaId];
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+                clientes.forEach((cliente) => {
+                    if (!searchTerm || cliente.nome.toLowerCase().includes(searchTerm)) {
+                        const option = document.createElement('option');
+                        option.value = cliente.id;
+                        option.textContent = cliente.nome;
+                        clienteSelect.appendChild(option);
+                    }
+                });
+            }
+
+            atualizarBotaoGerarLink();
+        }
+
+        // Função para filtrar empresas e clientes com base no campo de busca
+        function filtrarEmpresasEClientes() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const empresaSelect = document.getElementById('empresaSelect');
+            const clienteSelect = document.getElementById('clienteSelect');
+            const selectedEmpresa = empresaSelect.value;
+
+            // Filtra as empresas
+            empresaSelect.innerHTML = '<option value="">Selecione uma Empresa</option>';
+            const empresasFiltradas = empresas.filter(empresa => 
+                empresa.nome.toLowerCase().includes(searchTerm) ||
+                (clientesPorEmpresa[empresa.id] && clientesPorEmpresa[empresa.id].some(cliente => 
+                    cliente.nome.toLowerCase().includes(searchTerm)))
+            );
+
+            empresasFiltradas.forEach((empresa) => {
+                const option = document.createElement('option');
+                option.value = empresa.id;
+                option.textContent = empresa.nome;
+                if (empresa.id === selectedEmpresa) {
+                    option.selected = true;
+                }
+                empresaSelect.appendChild(option);
+            });
+
+            // Atualiza os clientes com base na empresa selecionada e no filtro
+            carregarClientes(selectedEmpresa);
+        }
+
+        // Função para atualizar o estado do botão "Gerar Link"
+        function atualizarBotaoGerarLink() {
+            const empresaSelect = document.getElementById('empresaSelect');
+            const clienteSelect = document.getElementById('clienteSelect');
+            const gerarLinkBtn = document.getElementById('gerarLinkBtn');
+            gerarLinkBtn.disabled = !empresaSelect.value || !clienteSelect.value;
+        }
+
+        // Função para mostrar o campo de busca
+        function mostrarCampoBusca() {
+            const searchContainer = document.getElementById('searchContainer');
+            searchContainer.style.display = 'block';
+            document.getElementById('searchInput').focus();
+        }
+
+        // Função para esconder o campo de busca
+        function esconderCampoBusca() {
+            const searchContainer = document.getElementById('searchContainer');
+            searchContainer.style.display = 'none';
+            document.getElementById('searchInput').value = ''; // Limpa o campo de busca
+            filtrarEmpresasEClientes(); // Restaura a lista completa
+        }
+
+        // Função para cadastrar um novo cliente
+        window.cadastrarCliente = async function () {
+            const empresaNome = document.getElementById('clienteEmpresa').value.trim();
+            const clienteNome = document.getElementById('clienteNome').value.trim();
+            const successMsg = document.getElementById('clienteSuccessMsg');
+
+            if (!empresaNome || !clienteNome) {
+                alert('Por favor, preencha todos os campos (nome da empresa e nome do cliente).');
+                return;
+            }
+
+            try {
+                // Verifica se a empresa já existe
+                const empresaRef = doc(db, 'clientes', empresaNome);
+                const empresaDoc = await getDoc(empresaRef);
+
+                if (!empresaDoc.exists()) {
+                    // Cria o documento da empresa
+                    await setDoc(empresaRef, {
+                        nome: empresaNome,
+                        criadoPor: userId,
+                        dataCriacao: serverTimestamp()
+                    });
+                }
+
+                // Adiciona o cliente na subcoleção "clientes" da empresa
+                const clienteRef = doc(db, `clientes/${empresaNome}/clientes`, clienteNome);
+                await setDoc(clienteRef, {
+                    nome: clienteNome,
+                    criadoPor: userId,
+                    dataCriacao: serverTimestamp()
+                });
+
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                    document.getElementById('clienteNome').value = '';
+                    document.getElementById('clienteEmpresa').value = '';
+                    carregarEmpresas();
+                }, 2000);
+            } catch (error) {
+                console.error('Erro ao cadastrar cliente:', error);
+                alert('Erro ao cadastrar cliente: ' + error.message);
+            }
+        };
+
+        // Função para gerar o link
+        window.gerarLink = function () {
+            const empresaSelect = document.getElementById('empresaSelect');
+            const clienteSelect = document.getElementById('clienteSelect');
+            const empresaId = empresaSelect.value;
+            const clienteId = clienteSelect.value;
+            const empresaNome = empresaSelect.options[empresaSelect.selectedIndex].text;
+
+            if (!empresaId || !clienteId) {
+                alert('Por favor, selecione uma empresa e um cliente.');
+                return;
+            }
+
+            const link = `https://contabilizar.github.io/avaliacao/${userId}.html?cliente=${clienteId}&empresa=${empresaNome}`;
+            const linkOutput = document.getElementById('linkOutput');
+            linkOutput.innerHTML = `
+                <div class="link-container">
+                    <a href="${link}" target="_blank">${link}</a>
+                    <button id="copyButton" onclick="copyLink('${link}')">Copiar</button>
+                </div>
+            `;
+        };
+
+        // Função para copiar o link
+        window.copyLink = function (link) {
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Link copiado para a área de transferência!');
+            }).catch((error) => {
+                console.error('Erro ao copiar o link:', error);
+                alert('Erro ao copiar o link. Por favor, copie manualmente.');
+            });
+        };
+
+        // Função de logout
+        window.logout = function () {
+            console.log('Executando logout...'); // Log para depuração
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userCargo');
+            localStorage.removeItem('userNome');
+            // Garante que o redirecionamento seja para o caminho correto
+            window.location.href = './login.html'; // Ajuste o caminho se necessário
+        };
+
+        // Adiciona eventos aos dropdowns e ao campo de busca
+        const empresaSelect = document.getElementById('empresaSelect');
+        empresaSelect.addEventListener('focus', () => {
+            mostrarCampoBusca();
+        });
+
+        // Esconde o campo de busca quando o dropdown de empresas perde o foco
+        empresaSelect.addEventListener('blur', () => {
+            // Usamos um pequeno atraso para permitir que a seleção seja registrada antes de esconder
+            setTimeout(() => {
+                if (document.activeElement !== document.getElementById('searchInput')) {
+                    esconderCampoBusca();
+                }
+            }, 200);
+        });
+
+        // Mantém o campo de busca visível enquanto o usuário está digitando nele
+        document.getElementById('searchInput').addEventListener('blur', () => {
+            // Esconde o campo de busca apenas se o foco não voltar para o dropdown de empresas
+            setTimeout(() => {
+                if (document.activeElement !== empresaSelect) {
+                    esconderCampoBusca();
+                }
+            }, 200);
+        });
+
+        empresaSelect.addEventListener('change', (e) => {
+            carregarClientes(e.target.value);
+        });
+
+        document.getElementById('clienteSelect').addEventListener('change', () => {
+            atualizarBotaoGerarLink();
+        });
+
+        document.getElementById('searchInput').addEventListener('input', () => {
+            filtrarEmpresasEClientes();
+        });
+
+        // Carrega as empresas ao iniciar a página
+        carregarEmpresas();
+    </script>
+</body>
+</html>

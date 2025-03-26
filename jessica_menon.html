@@ -57,11 +57,13 @@
         }
         .container { 
             max-width: 450px; 
+            width: 90%; 
             background: var(--bg-light); 
             padding: calc(var(--spacing-unit) * 2); 
             border-radius: var(--border-radius); 
             box-shadow: var(--shadow); 
             text-align: center; 
+            margin: 0 auto; 
         }
         .employee-photo { 
             width: 80px; 
@@ -85,8 +87,6 @@
             color: #4b5563; 
             margin-bottom: calc(var(--spacing-unit) * 2); 
         }
-
-        /* Estilos do Carrossel */
         .carousel { 
             position: relative; 
             overflow: hidden; 
@@ -141,8 +141,6 @@
         .carousel-nav.hidden { 
             display: none; 
         }
-
-        /* Estilo do Slide de Agradecimento */
         .thank-you-slide { 
             display: flex; 
             flex-direction: column; 
@@ -177,8 +175,6 @@
         .thank-you-slide button:hover { 
             background: #003087; 
         }
-
-        /* Estilos da Avaliação */
         .rating-section { 
             display: none; 
         }
@@ -241,20 +237,86 @@
             display: none; 
             font-size: 0.9rem; 
         }
-
         @media (max-width: 767px) {
-            .header { min-height: 60px; }
-            body { padding-top: 60px; }
-            .container { padding: calc(var(--spacing-unit) * 1); }
-            .title { font-size: 1.5rem; }
-            .subtitle { font-size: 0.9rem; }
-            .rating label { font-size: 1.5rem; }
-            .employee-photo { width: 60px; height: 60px; }
-            .carousel-slide h3 { font-size: 1rem; }
-            .answer-input { font-size: 0.9rem; padding: 0.4rem; }
-            .thank-you-slide h3 { font-size: 1.2rem; }
-            .thank-you-slide p { font-size: 0.9rem; }
-            .thank-you-slide i { font-size: 2rem; }
+            :root {
+                --spacing-unit: 0.75rem;
+            }
+            .header { 
+                min-height: 50px;
+            }
+            body { 
+                padding-top: 50px;
+            }
+            .container { 
+                padding: calc(var(--spacing-unit) * 1);
+                width: 95%;
+            }
+            .logo { 
+                max-height: 40px;
+            }
+            .employee-photo { 
+                width: 60px; 
+                height: 60px;
+                border-width: 2px;
+            }
+            .title { 
+                font-size: 1.5rem;
+            }
+            .subtitle { 
+                font-size: 0.85rem;
+                margin-bottom: calc(var(--spacing-unit) * 1);
+            }
+            .carousel-slide h3 { 
+                font-size: 1rem;
+                margin-bottom: calc(var(--spacing-unit) * 0.75);
+            }
+            .answer-input { 
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5);
+                margin-bottom: calc(var(--spacing-unit) * 0.75);
+            }
+            .carousel-nav { 
+                gap: 0.5rem;
+            }
+            .carousel-nav button { 
+                font-size: 0.85rem;
+                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            }
+            .rating-section h3 { 
+                font-size: 1rem;
+            }
+            .rating label { 
+                font-size: 1.5rem;
+            }
+            textarea { 
+                height: 80px;
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5);
+            }
+            button { 
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            }
+            .success { 
+                font-size: 0.8rem;
+            }
+            .thank-you-slide { 
+                min-height: 150px;
+            }
+            .thank-you-slide i { 
+                font-size: 2rem;
+            }
+            .thank-you-slide h3 { 
+                font-size: 1.2rem;
+            }
+            .thank-you-slide p { 
+                font-size: 0.85rem;
+                margin-bottom: calc(var(--spacing-unit) * 0.75);
+            }
+            .thank-you-slide button { 
+                font-size: 0.85rem;
+                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            }
         }
     </style>
 </head>
@@ -322,7 +384,41 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // Importa os módulos do Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNidw_VCAVleo0UxTzVkqQhEYXfshB5tk",
+            authDomain: "avaliacao-contabilizar.firebaseapp.com",
+            projectId: "avaliacao-contabilizar",
+            storageBucket: "avaliacao-contabilizar.firebasestorage.app",
+            messagingSenderId: "934194892065",
+            appId: "1:934194892065:web:f8654e039343b38ee38260"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Função para obter parâmetros da URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Obtém os parâmetros cliente e empresa da URL
+        const clienteId = getQueryParam('cliente');
+        const empresa = getQueryParam('empresa');
+
+        // Valida se os parâmetros estão presentes
+        if (!clienteId || !empresa) {
+            alert('Erro: Cliente ou empresa não especificados na URL. Por favor, contate o administrador.');
+            throw new Error('Cliente ou empresa não especificados na URL');
+        }
+
         // Lógica do Carrossel
         const slides = document.querySelectorAll('.carousel-slide');
         const slidesContainer = document.getElementById('carouselSlides');
@@ -334,7 +430,6 @@
         const restartBtn = document.getElementById('restartBtn');
         let currentSlide = 0;
 
-        // Função para atualizar o carrossel
         function updateCarousel() {
             console.log(`Atualizando carrossel. Slide atual: ${currentSlide}`);
             slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
@@ -354,11 +449,10 @@
             }
         }
 
-        // Verifica se a pergunta atual foi respondida
         function isSlideAnswered(slideIndex) {
             if (slideIndex === slides.length - 1) {
                 console.log("Slide de agradecimento, não precisa de resposta.");
-                return true; // Slide de agradecimento não precisa de resposta
+                return true;
             }
             const slide = slides[slideIndex];
             const input = slide.querySelector('.answer-input');
@@ -367,9 +461,8 @@
             return answered;
         }
 
-        // Habilita o botão "Próximo" quando o usuário digita algo
         slides.forEach((slide, index) => {
-            if (index === slides.length - 1) return; // Ignora o slide de agradecimento
+            if (index === slides.length - 1) return;
             const input = slide.querySelector('.answer-input');
             input.addEventListener('input', () => {
                 if (currentSlide === index) {
@@ -379,7 +472,6 @@
             });
         });
 
-        // Navegação do carrossel
         prevBtn.addEventListener('click', () => {
             if (currentSlide > 0) {
                 currentSlide--;
@@ -400,7 +492,6 @@
             }
         });
 
-        // Reinicia o carrossel
         restartBtn.addEventListener('click', () => {
             console.log("Clicou em Avaliar Novamente. Reiniciando carrossel.");
             currentSlide = 0;
@@ -410,7 +501,6 @@
             updateCarousel();
         });
 
-        // Inicializa o carrossel
         updateCarousel();
 
         // Lógica de envio da avaliação
@@ -418,12 +508,11 @@
         const form = document.getElementById('ratingSection');
         const successMsg = document.getElementById('successMsg');
 
-        document.getElementById('submitBtn').addEventListener('click', (e) => {
+        document.getElementById('submitBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             const nota = document.querySelector('input[name="nota"]:checked')?.value;
             const comentario = document.getElementById('comentario').value;
 
-            // Coleta as respostas das perguntas
             const respostas = {};
             for (let i = 1; i <= 5; i++) {
                 const resposta = document.getElementById(`q${i}`).value.trim();
@@ -435,35 +524,37 @@
                 return;
             }
 
-            // Simulação de envio (próximo passo: Firebase)
-            console.log({
-                funcionario: funcionarioId,
+            const avaliacao = {
+                cliente: clienteId,
                 respostas: respostas,
-                nota: nota,
-                comentario: comentario,
+                nota: parseInt(nota),
+                comentario: comentario || '',
                 data: new Date().toISOString()
-            });
+            };
 
-            // Feedback visual
-            console.log("Enviando avaliação...");
-            document.getElementById('submitBtn').disabled = true;
-            successMsg.style.display = 'block';
+            try {
+                console.log("Enviando avaliação para o Firebase...");
+                const evaluationId = `avaliacao_${Date.now()}`;
+                await setDoc(doc(db, `avaliacoes/empresas/${empresa}/funcionarios/${funcionarioId}/avaliacoes`, evaluationId), avaliacao);
+                console.log("Avaliação salva com sucesso!");
 
-            setTimeout(() => {
-                console.log("Avaliação enviada. Preparando para mostrar o slide de agradecimento...");
-                form.reset();
-                document.getElementById('submitBtn').disabled = false;
-                successMsg.style.display = 'none';
+                document.getElementById('submitBtn').disabled = true;
+                successMsg.style.display = 'block';
 
-                // Garante que o carrossel está visível e a seção de avaliação está escondida
-                ratingSection.style.display = 'none';
-                carousel.style.display = 'block';
-
-                // Move para o slide de agradecimento
-                currentSlide = slides.length - 1;
-                console.log(`Definindo currentSlide para ${currentSlide} (slide de agradecimento).`);
-                updateCarousel();
-            }, 2000);
+                setTimeout(() => {
+                    console.log("Avaliação enviada. Mostrando slide de agradecimento...");
+                    form.reset();
+                    document.getElementById('submitBtn').disabled = false;
+                    successMsg.style.display = 'none';
+                    ratingSection.style.display = 'none';
+                    carousel.style.display = 'block';
+                    currentSlide = slides.length - 1;
+                    updateCarousel();
+                }, 2000);
+            } catch (error) {
+                console.error("Erro ao salvar a avaliação:", error);
+                alert('Erro ao enviar a avaliação. Tente novamente.');
+            }
         });
     </script>
 </body>

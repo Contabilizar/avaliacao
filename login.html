@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Contabilizar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #000051;
+            --secondary: #e5e5e5;
+            --bg-light: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --spacing-unit: 1rem;
+            --border-radius: 1.5rem;
+            --header-height: 80px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-light); 
+            color: var(--primary); 
+            line-height: 1.6; 
+            padding-top: var(--header-height); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        .header { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            z-index: 1000; 
+            background: var(--primary); 
+            min-height: var(--header-height); 
+            border-bottom: 2px solid var(--bg-light); 
+            box-shadow: var(--shadow); 
+            display: flex; 
+            align-items: center; 
+        }
+        .header-content { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 calc(var(--spacing-unit) * 1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 100%; 
+        }
+        .logo { 
+            max-height: 60px; 
+            width: auto; 
+            object-fit: contain; 
+        }
+        .container { 
+            max-width: 450px; 
+            width: 90%; 
+            background: var(--bg-light); 
+            padding: calc(var(--spacing-unit) * 2); 
+            border-radius: var(--border-radius); 
+            box-shadow: var(--shadow); 
+            text-align: center; 
+            margin: 0 auto; 
+        }
+        .title { 
+            font-size: 2rem; 
+            font-weight: 700; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            background: linear-gradient(90deg, var(--primary), #003087); 
+            -webkit-background-clip: text; 
+            color: transparent; 
+        }
+        .subtitle { 
+            font-size: 1rem; 
+            color: #4b5563; 
+            margin-bottom: calc(var(--spacing-unit) * 2); 
+        }
+        .login-form { 
+            display: flex; 
+            flex-direction: column; 
+            gap: calc(var(--spacing-unit) * 1); 
+        }
+        .login-form input { 
+            width: 100%; 
+            padding: calc(var(--spacing-unit) * 0.75); 
+            border: 1px solid var(--secondary); 
+            border-radius: 0.5rem; 
+            font-size: 1rem; 
+            transition: var(--transition); 
+        }
+        .login-form input:focus { 
+            border-color: var(--primary); 
+            outline: none; 
+        }
+        .login-form button { 
+            background: var(--primary); 
+            color: #fff; 
+            padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5); 
+            border: none; 
+            border-radius: 0.5rem; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+        }
+        .login-form button:hover { 
+            background: #003087; 
+        }
+        .error { 
+            color: #e74c3c; 
+            margin-top: calc(var(--spacing-unit) * 0.5); 
+            display: none; 
+            font-size: 0.9rem; 
+        }
+        @media (max-width: 767px) {
+            :root {
+                --spacing-unit: 0.75rem;
+            }
+            .header { 
+                min-height: 50px;
+            }
+            body { 
+                padding-top: 50px;
+            }
+            .container { 
+                padding: calc(var(--spacing-unit) * 1);
+                width: 95%;
+            }
+            .logo { 
+                max-height: 40px;
+            }
+            .title { 
+                font-size: 1.5rem;
+            }
+            .subtitle { 
+                font-size: 0.85rem;
+                margin-bottom: calc(var(--spacing-unit) * 1);
+            }
+            .login-form input { 
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5);
+            }
+            .login-form button { 
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            }
+            .error { 
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="logo.png" alt="Logo Contabilizar" class="logo">
+        </div>
+    </header>
+    <div class="container">
+        <h1 class="title">Login</h1>
+        <p class="subtitle">Acesse sua conta para continuar</p>
+        <div class="login-form">
+            <input type="text" id="username" placeholder="Nome do Colaborador">
+            <input type="password" id="password" placeholder="Senha">
+            <button onclick="login()">Entrar</button>
+            <p class="error" id="errorMsg">Usuário ou senha incorretos.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        // Importa os módulos do Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNidw_VCAVleo0UxTzVkqQhEYXfshB5tk",
+            authDomain: "avaliacao-contabilizar.firebaseapp.com",
+            projectId: "avaliacao-contabilizar",
+            storageBucket: "avaliacao-contabilizar.firebasestorage.app",
+            messagingSenderId: "934194892065",
+            appId: "1:934194892065:web:f8654e039343b38ee38260"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Função de login
+        window.login = async function () {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!username || !password) {
+                errorMsg.textContent = 'Por favor, preencha todos os campos.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            try {
+                // Busca o usuário pelo nome
+                const q = query(collection(db, 'funcionarios'), where('nome', '==', username));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const userDoc = querySnapshot.docs[0]; // Pega o primeiro documento correspondente
+                    const userData = userDoc.data();
+                    const userId = userDoc.id; // Obtém o ID do documento
+
+                    if (userData.senha === password) {
+                        // Login bem-sucedido
+                        localStorage.setItem('userId', userId);
+                        localStorage.setItem('userCargo', userData.cargo);
+                        localStorage.setItem('userNome', userData.nome);
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        errorMsg.textContent = 'Usuário ou senha incorretos.';
+                        errorMsg.style.display = 'block';
+                    }
+                } else {
+                    errorMsg.textContent = 'Usuário não encontrado.';
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Erro ao fazer login:', error);
+                errorMsg.textContent = 'Erro ao fazer login. Tente novamente.';
+                errorMsg.style.display = 'block';
+            }
+        };
+    </script>
+</body>
+</html>

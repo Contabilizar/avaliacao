@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Contabilizar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #000051;
+            --secondary: #e5e5e5;
+            --bg-light: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --spacing-unit: 1rem;
+            --border-radius: 1.5rem;
+            --header-height: 80px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-light); 
+            color: var(--primary); 
+            line-height: 1.6; 
+            padding-top: var(--header-height); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        .header { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            z-index: 1000; 
+            background: var(--primary); 
+            min-height: var(--header-height); 
+            border-bottom: 2px solid var(--bg-light); 
+            box-shadow: var(--shadow); 
+            display: flex; 
+            align-items: center; 
+        }
+        .header-content { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 calc(var(--spacing-unit) * 1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            width: 100%; 
+        }
+        .logo { 
+            max-height: 60px; 
+            width: auto; 
+            object-fit: contain; 
+        }
+        .user-info { 
+            color: #fff; 
+            font-size: 1rem; 
+        }
+        .logout-btn { 
+            background: #e74c3c; 
+            color: #fff; 
+            padding: 0.5rem 1rem; 
+            border: none; 
+            border-radius: 0.5rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+        }
+        .logout-btn:hover { 
+            background: #c0392b; 
+        }
+        .container { 
+            max-width: 450px; 
+            width: 90%; 
+            background: var(--bg-light); 
+            padding: calc(var(--spacing-unit) * 2); 
+            border-radius: var(--border-radius); 
+            box-shadow: var(--shadow); 
+            text-align: center; 
+            margin: 0 auto; 
+        }
+        .title { 
+            font-size: 2rem; 
+            font-weight: 700; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            background: linear-gradient(90deg, var(--primary), #003087); 
+            -webkit-background-clip: text; 
+            color: transparent; 
+        }
+        .subtitle { 
+            font-size: 1rem; 
+            color: #4b5563; 
+            margin-bottom: calc(var(--spacing-unit) * 2); 
+        }
+        .menu { 
+            display: flex; 
+            flex-direction: column; 
+            gap: calc(var(--spacing-unit) * 1); 
+        }
+        .menu button { 
+            background: var(--primary); 
+            color: #fff; 
+            padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5); 
+            border: none; 
+            border-radius: 0.5rem; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+        }
+        .menu button:hover { 
+            background: #003087; 
+        }
+        .hidden { 
+            display: none; 
+        }
+        @media (max-width: 767px) {
+            :root {
+                --spacing-unit: 0.75rem;
+            }
+            .header { 
+                min-height: 50px;
+            }
+            body { 
+                padding-top: 50px;
+            }
+            .container { 
+                padding: calc(var(--spacing-unit) * 1);
+                width: 95%;
+            }
+            .logo { 
+                max-height: 40px;
+            }
+            .user-info { 
+                font-size: 0.85rem;
+            }
+            .logout-btn { 
+                font-size: 0.85rem;
+                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            }
+            .title { 
+                font-size: 1.5rem;
+            }
+            .subtitle { 
+                font-size: 0.85rem;
+                margin-bottom: calc(var(--spacing-unit) * 1);
+            }
+            .menu button { 
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="logo.png" alt="Logo Contabilizar" class="logo">
+            <div class="user-info">
+                <span id="userName"></span> | <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <h1 class="title">Bem-vindo(a), <span id="welcomeName"></span></h1>
+        <p class="subtitle">Selecione uma opção abaixo</p>
+        <div class="menu">
+            <button onclick="window.location.href='gerar_link.html'">Gerar Link de Avaliação</button>
+            <button id="relatoriosBtn" class="hidden" onclick="window.location.href='relatorios.html'">Relatórios Mensais</button>
+            <button id="configuracoesBtn" class="hidden" onclick="window.location.href='configuracoes.html'">Configurações</button>
+        </div>
+    </div>
+
+    <script>
+        // Verifica se o usuário está logado
+        const userId = localStorage.getItem('userId');
+        const userCargo = localStorage.getItem('userCargo');
+        const userNome = localStorage.getItem('userNome');
+
+        if (!userId || !userCargo || !userNome) {
+            window.location.href = 'login.html'; // Alterado de gerar_link.html para login.html
+        }
+
+        // Exibe o nome do usuário
+        document.getElementById('userName').textContent = userNome;
+        document.getElementById('welcomeName').textContent = userNome;
+
+        // Mostra opções adicionais para administradores
+        if (userCargo === 'administrador') {
+            document.getElementById('relatoriosBtn').classList.remove('hidden');
+            document.getElementById('configuracoesBtn').classList.remove('hidden');
+        }
+
+        // Função de logout
+        window.logout = function () {
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userCargo');
+            localStorage.removeItem('userNome');
+            window.location.href = 'login.html'; // Alterado de gerar_link.html para login.html
+        };
+    </script>
+</body>
+</html>
