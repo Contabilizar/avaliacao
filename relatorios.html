@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://cdn.firebase.com https://*.firebaseio.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https://contabilizar.github.io; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com;">
     <title>Relatórios Mensais - Contabilizar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -23,9 +24,6 @@
             color: var(--primary); 
             line-height: 1.6; 
             padding-top: var(--header-height); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
             min-height: 100vh; 
         }
         .header { 
@@ -72,14 +70,14 @@
             background: #c0392b; 
         }
         .container { 
-            max-width: 600px; 
+            max-width: 1200px; 
             width: 90%; 
             background: var(--bg-light); 
             padding: calc(var(--spacing-unit) * 2); 
             border-radius: var(--border-radius); 
             box-shadow: var(--shadow); 
             text-align: center; 
-            margin: 0 auto; 
+            margin: calc(var(--spacing-unit) * 2) auto; 
         }
         .title { 
             font-size: 2rem; 
@@ -94,6 +92,46 @@
             color: #4b5563; 
             margin-bottom: calc(var(--spacing-unit) * 2); 
         }
+        .filter-section { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 1rem; 
+            margin-bottom: calc(var(--spacing-unit) * 2); 
+            justify-content: center; 
+        }
+        .filter-section select, 
+        .filter-section input { 
+            padding: 0.5rem; 
+            border: 1px solid var(--secondary); 
+            border-radius: 0.5rem; 
+            font-size: 1rem; 
+            width: 200px; 
+        }
+        .filter-section button { 
+            background: var(--primary); 
+            color: #fff; 
+            padding: 0.5rem 1rem; 
+            border: none; 
+            border-radius: 0.5rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+        }
+        .filter-section button:hover { 
+            background: #003087; 
+        }
+        .export-btn { 
+            background: #27ae60; 
+            color: #fff; 
+            padding: 0.5rem 1rem; 
+            border: none; 
+            border-radius: 0.5rem; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            margin-bottom: calc(var(--spacing-unit) * 2); 
+        }
+        .export-btn:hover { 
+            background: #219653; 
+        }
         .report-table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -103,6 +141,7 @@
             padding: calc(var(--spacing-unit) * 0.75); 
             border: 1px solid var(--secondary); 
             text-align: left; 
+            font-size: 0.9rem; 
         }
         .report-table th { 
             background: var(--primary); 
@@ -142,8 +181,18 @@
                 font-size: 0.85rem;
                 margin-bottom: calc(var(--spacing-unit) * 1);
             }
+            .filter-section select, 
+            .filter-section input { 
+                width: 100%; 
+                margin-bottom: 0.5rem; 
+            }
+            .filter-section button, 
+            .export-btn { 
+                width: 100%; 
+                font-size: 0.9rem; 
+            }
             .report-table th, .report-table td { 
-                font-size: 0.9rem;
+                font-size: 0.8rem;
                 padding: calc(var(--spacing-unit) * 0.5);
             }
         }
@@ -159,14 +208,40 @@
         </div>
     </header>
     <div class="container">
-        <h1 class="title">Relatórios Mensais</h1>
-        <p class="subtitle">Média de notas por funcionário no último mês</p>
+        <h1 class="title">Relatórios de Avaliações</h1>
+        <p class="subtitle">Filtre e visualize as avaliações detalhadas</p>
+
+        <!-- Seção de Filtros -->
+        <div class="filter-section">
+            <select id="filtroFuncionario">
+                <option value="">Todos os Funcionários</option>
+            </select>
+            <select id="filtroEmpresa">
+                <option value="">Todas as Empresas</option>
+            </select>
+            <input type="date" id="filtroDataInicio" placeholder="Data Início">
+            <input type="date" id="filtroDataFim" placeholder="Data Fim">
+            <button onclick="filtrarAvaliacoes()">Filtrar</button>
+        </div>
+
+        <!-- Botão de Exportação -->
+        <button class="export-btn" onclick="exportarExcel()">Exportar para Excel</button>
+
+        <!-- Tabela de Avaliações Detalhadas -->
         <table class="report-table">
             <thead>
                 <tr>
                     <th>Funcionário</th>
-                    <th>Média de Notas</th>
-                    <th>Número de Avaliações</th>
+                    <th>Empresa</th>
+                    <th>Cliente</th>
+                    <th>Pergunta 1</th>
+                    <th>Pergunta 2</th>
+                    <th>Pergunta 3</th>
+                    <th>Pergunta 4</th>
+                    <th>Pergunta 5</th>
+                    <th>Nota</th>
+                    <th>Comentário</th>
+                    <th>Data</th>
                 </tr>
             </thead>
             <tbody id="reportTableBody"></tbody>
@@ -176,7 +251,7 @@
     <script type="module">
         // Importa os módulos do Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-        import { getFirestore, collection, getDocs, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        import { getFirestore, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
         // Configuração do Firebase
         const firebaseConfig = {
@@ -198,58 +273,185 @@
         const userNome = localStorage.getItem('userNome');
 
         if (!userId || !userCargo || !userNome || userCargo !== 'administrador') {
-            window.location.href = 'login.html'; // Alterado de gerar_link.html para login.html
+            window.location.href = 'login.html';
         }
 
         // Exibe o nome do usuário
         document.getElementById('userName').textContent = userNome;
 
-        // Função para carregar relatórios
-        async function carregarRelatorios() {
+        // Função para normalizar nomes (remover espaços e caracteres especiais)
+        function normalizarNome(nome) {
+            return nome.replace(/\s+/g, '');
+        }
+
+        // Função para carregar os funcionários e empresas nos filtros
+        async function carregarFiltros() {
+            const filtroFuncionario = document.getElementById('filtroFuncionario');
+            const filtroEmpresa = document.getElementById('filtroEmpresa');
+
+            try {
+                // Carrega os funcionários
+                const funcionariosSnapshot = await getDocs(collection(db, 'funcionarios'));
+                console.log('Funcionários encontrados:', funcionariosSnapshot.size);
+                funcionariosSnapshot.forEach(doc => {
+                    const funcionario = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = funcionario.nome;
+                    filtroFuncionario.appendChild(option);
+                });
+
+                // Carrega as empresas da coleção "empresas"
+                const empresasSnapshot = await getDocs(collection(db, 'empresas'));
+                console.log('Empresas encontradas:', empresasSnapshot.size);
+                empresasSnapshot.forEach(doc => {
+                    const empresa = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = empresa.nome;
+                    filtroEmpresa.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar filtros:', error);
+            }
+        }
+
+        // Função para carregar e filtrar avaliações
+        async function filtrarAvaliacoes() {
             const reportTableBody = document.getElementById('reportTableBody');
             reportTableBody.innerHTML = '';
 
-            // Obtém todos os funcionários
-            const funcionariosSnapshot = await getDocs(collection(db, 'funcionarios'));
-            const lastMonth = new Date();
-            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            let filtroFuncionario = document.getElementById('filtroFuncionario').value;
+            let filtroEmpresa = document.getElementById('filtroEmpresa').value;
+            const filtroDataInicio = document.getElementById('filtroDataInicio').value;
+            const filtroDataFim = document.getElementById('filtroDataFim').value;
 
-            for (const funcionarioDoc of funcionariosSnapshot.docs) {
-                const funcionarioId = funcionarioDoc.id;
-                const funcionarioData = funcionarioDoc.data();
-                const nome = funcionarioData.nome;
+            // Normaliza os valores dos filtros
+            if (filtroFuncionario) {
+                filtroFuncionario = normalizarNome(filtroFuncionario);
+            }
+            if (filtroEmpresa) {
+                filtroEmpresa = normalizarNome(filtroEmpresa);
+            }
 
-                // Obtém as avaliações do último mês
-                const avaliacoesRef = collection(db, `avaliacoes/empresas`);
-                const empresasSnapshot = await getDocs(avaliacoesRef);
+            console.log('Filtros aplicados:', {
+                filtroFuncionario,
+                filtroEmpresa,
+                filtroDataInicio,
+                filtroDataFim
+            });
 
-                let totalNotas = 0;
-                let totalAvaliacoes = 0;
+            try {
+                // Carrega as empresas da coleção "empresas"
+                let empresasQuery = collection(db, 'empresas');
+                if (filtroEmpresa) {
+                    empresasQuery = query(empresasQuery, where('__name__', '==', filtroEmpresa));
+                }
+                const empresasSnapshot = await getDocs(empresasQuery);
+                console.log('Empresas após filtro:', empresasSnapshot.size);
+                empresasSnapshot.forEach(doc => {
+                    console.log('Empresa ID:', doc.id);
+                });
 
+                // Obtém os funcionários
+                let funcionariosQuery = collection(db, 'funcionarios');
+                if (filtroFuncionario) {
+                    funcionariosQuery = query(funcionariosQuery, where('__name__', '==', filtroFuncionario));
+                }
+                const funcionariosSnapshot = await getDocs(funcionariosQuery);
+                console.log('Funcionários após filtro:', funcionariosSnapshot.size);
+                funcionariosSnapshot.forEach(doc => {
+                    console.log('Funcionário ID:', doc.id);
+                });
+
+                // Para cada empresa e funcionário, busca as avaliações
                 for (const empresaDoc of empresasSnapshot.docs) {
                     const empresaId = empresaDoc.id;
-                    const avaliacoesQuery = query(
-                        collection(db, `avaliacoes/empresas/${empresaId}/funcionarios/${funcionarioId}/avaliacoes`),
-                        where('data', '>=', lastMonth.toISOString())
-                    );
-                    const avaliacoesSnapshot = await getDocs(avaliacoesQuery);
+                    console.log('Processando empresa:', empresaId);
 
-                    avaliacoesSnapshot.forEach((avaliacaoDoc) => {
-                        const avaliacaoData = avaliacaoDoc.data();
-                        totalNotas += avaliacaoData.nota;
-                        totalAvaliacoes++;
-                    });
+                    for (const funcionarioDoc of funcionariosSnapshot.docs) {
+                        const funcionarioId = funcionarioDoc.id;
+                        const funcionarioData = funcionarioDoc.data();
+                        const nomeFuncionario = funcionarioData.nome;
+                        console.log('Processando funcionário:', funcionarioId, nomeFuncionario);
+
+                        // Busca as avaliações no caminho correto
+                        let avaliacoesRef = collection(db, `avaliacoes/${empresaId}/${funcionarioId}`);
+                        let avaliacoesQuery = query(avaliacoesRef);
+
+                        // Aplica filtro de data, se fornecido
+                        if (filtroDataInicio) {
+                            const dataInicio = new Date(filtroDataInicio);
+                            dataInicio.setUTCHours(0, 0, 0, 0);
+                            avaliacoesQuery = query(avaliacoesQuery, where('data', '>=', dataInicio));
+                            console.log('Filtro de data início aplicado:', dataInicio);
+                        }
+                        if (filtroDataFim) {
+                            const dataFim = new Date(filtroDataFim);
+                            dataFim.setUTCHours(23, 59, 59, 999);
+                            avaliacoesQuery = query(avaliacoesQuery, where('data', '<=', dataFim));
+                            console.log('Filtro de data fim aplicado:', dataFim);
+                        }
+
+                        const avaliacoesSnapshot = await getDocs(avaliacoesQuery);
+                        console.log(`Avaliações encontradas para ${empresaId}/${funcionarioId}:`, avaliacoesSnapshot.size);
+                        avaliacoesSnapshot.forEach(doc => {
+                            console.log('Avaliação bruta:', doc.id, doc.data());
+                        });
+
+                        // Exibe as avaliações na tabela
+                        avaliacoesSnapshot.forEach(doc => {
+                            const avaliacao = doc.data();
+                            const data = avaliacao.data ? avaliacao.data.toDate().toLocaleString('pt-BR') : 'N/A';
+                            console.log('Avaliação processada:', avaliacao);
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${nomeFuncionario}</td>
+                                <td>${empresaId}</td>
+                                <td>${avaliacao.cliente || 'N/A'}</td>
+                                <td>${avaliacao.respostas?.pergunta1 || 'N/A'}</td>
+                                <td>${avaliacao.respostas?.pergunta2 || 'N/A'}</td>
+                                <td>${avaliacao.respostas?.pergunta3 || 'N/A'}</td>
+                                <td>${avaliacao.respostas?.pergunta4 || 'N/A'}</td>
+                                <td>${avaliacao.respostas?.pergunta5 || 'N/A'}</td>
+                                <td>${avaliacao.nota || 'N/A'}</td>
+                                <td>${avaliacao.comentario || 'N/A'}</td>
+                                <td>${data}</td>
+                            `;
+                            reportTableBody.appendChild(row);
+                        });
+                    }
                 }
 
-                const media = totalAvaliacoes > 0 ? (totalNotas / totalAvaliacoes).toFixed(2) : 'N/A';
+                if (reportTableBody.children.length === 0) {
+                    console.log('Nenhuma avaliação encontrada após aplicar os filtros.');
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="11">Nenhuma avaliação encontrada.</td>`;
+                    reportTableBody.appendChild(row);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar avaliações:', error);
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${nome}</td>
-                    <td>${media}</td>
-                    <td>${totalAvaliacoes}</td>
-                `;
+                row.innerHTML = `<td colspan="11">Erro ao carregar avaliações: ${error.message}</td>`;
                 reportTableBody.appendChild(row);
             }
+        }
+
+        // Função para exportar os dados para Excel
+        function exportarExcel() {
+            const table = document.querySelector('.report-table');
+            const rows = Array.from(table.querySelectorAll('tr'));
+            const data = rows.map(row => {
+                return Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent);
+            });
+
+            // Cria uma planilha
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Relatório de Avaliações');
+
+            // Exporta o arquivo
+            XLSX.writeFile(wb, 'relatorio_avaliacoes.xlsx');
         }
 
         // Função de logout
@@ -257,11 +459,18 @@
             localStorage.removeItem('userId');
             localStorage.removeItem('userCargo');
             localStorage.removeItem('userNome');
-            window.location.href = 'login.html'; // Alterado de gerar_link.html para login.html
+            window.location.href = 'login.html';
         };
 
-        // Carrega os relatórios ao iniciar a página
-        carregarRelatorios();
+        // Expor as funções para o escopo global
+        window.filtrarAvaliacoes = filtrarAvaliacoes;
+        window.exportarExcel = exportarExcel;
+
+        // Carrega os filtros e as avaliações ao iniciar a página
+        carregarFiltros().then(() => filtrarAvaliacoes());
     </script>
+
+    <!-- Biblioteca SheetJS para exportação para Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
 </html>
