@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://cdn.firebase.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https://contabilizar.github.io; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com;">
     <title>Avaliação - Contabilizar - Pedro Casas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -387,7 +388,7 @@
     <script type="module">
         // Importa os módulos do Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
         // Configuração do Firebase
         const firebaseConfig = {
@@ -403,6 +404,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Função para normalizar nomes (remover espaços e caracteres especiais)
+        function normalizarNome(nome) {
+            return nome.replace(/\s+/g, '');
+        }
+
         // Função para obter parâmetros da URL
         function getQueryParam(param) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -411,7 +417,7 @@
 
         // Obtém os parâmetros cliente e empresa da URL
         const clienteId = getQueryParam('cliente');
-        const empresa = getQueryParam('empresa');
+        const empresa = normalizarNome(getQueryParam('empresa'));
 
         // Valida se os parâmetros estão presentes
         if (!clienteId || !empresa) {
@@ -529,13 +535,15 @@
                 respostas: respostas,
                 nota: parseInt(nota),
                 comentario: comentario || '',
-                data: new Date().toISOString()
+                data: serverTimestamp()
             };
 
             try {
                 console.log("Enviando avaliação para o Firebase...");
                 const evaluationId = `avaliacao_${Date.now()}`;
-                await setDoc(doc(db, `avaliacoes/empresas/${empresa}/funcionarios/${funcionarioId}/avaliacoes`, evaluationId), avaliacao);
+                // Caminho ajustado: avaliacoes/empresa/funcionario/avaliacaoId
+                const docRef = doc(db, "avaliacoes", empresa, funcionarioId, evaluationId);
+                await setDoc(docRef, avaliacao);
                 console.log("Avaliação salva com sucesso!");
 
                 document.getElementById('submitBtn').disabled = true;
