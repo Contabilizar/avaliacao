@@ -139,33 +139,18 @@
             border: 1px solid var(--secondary); 
             border-radius: 0.5rem; 
             background: #f9f9f9; 
-            word-wrap: break-word; 
             text-align: center; 
-        }
-        .link-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-        #linkOutput a { 
-            color: var(--primary); 
-            text-decoration: none;
-            flex-grow: 1;
-            overflow-wrap: break-word;
-        }
-        #linkOutput a:hover { 
-            text-decoration: underline; 
         }
         #copyButton {
             background: var(--primary);
             color: #fff;
-            padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5);
             border: none;
             border-radius: 0.5rem;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: var(--transition);
+            width: 100%;
         }
         #copyButton:hover {
             background: #003087;
@@ -235,8 +220,8 @@
                 padding: calc(var(--spacing-unit) * 0.5);
             }
             #copyButton {
-                font-size: 0.8rem;
-                padding: calc(var(--spacing-unit) * 0.3) calc(var(--spacing-unit) * 0.6);
+                font-size: 0.9rem;
+                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
             }
             .success { 
                 font-size: 0.8rem;
@@ -495,10 +480,7 @@
             const link = `https://contabilizar.github.io/avaliacao/${userId}.html?cliente=${clienteId}&empresa=${empresaNome}`;
             const linkOutput = document.getElementById('linkOutput');
             linkOutput.innerHTML = `
-                <div class="link-container">
-                    <a href="${link}" target="_blank">${link}</a>
-                    <button id="copyButton" onclick="copyLink('${link}')">Copiar</button>
-                </div>
+                <button id="copyButton" onclick="copyLink('${link}')">Copiar Link</button>
             `;
         };
 
@@ -514,12 +496,11 @@
 
         // Função de logout
         window.logout = function () {
-            console.log('Executando logout...'); // Log para depuração
+            console.log('Executando logout...');
             localStorage.removeItem('userId');
             localStorage.removeItem('userCargo');
             localStorage.removeItem('userNome');
-            // Garante que o redirecionamento seja para o caminho correto
-            window.location.href = './login.html'; // Ajuste o caminho se necessário
+            window.location.href = './login.html';
         };
 
         // Adiciona eventos aos dropdowns e ao campo de busca
@@ -528,9 +509,7 @@
             mostrarCampoBusca();
         });
 
-        // Esconde o campo de busca quando o dropdown de empresas perde o foco
         empresaSelect.addEventListener('blur', () => {
-            // Usamos um pequeno atraso para permitir que a seleção seja registrada antes de esconder
             setTimeout(() => {
                 if (document.activeElement !== document.getElementById('searchInput')) {
                     esconderCampoBusca();
@@ -538,9 +517,7 @@
             }, 200);
         });
 
-        // Mantém o campo de busca visível enquanto o usuário está digitando nele
         document.getElementById('searchInput').addEventListener('blur', () => {
-            // Esconde o campo de busca apenas se o foco não voltar para o dropdown de empresas
             setTimeout(() => {
                 if (document.activeElement !== empresaSelect) {
                     esconderCampoBusca();
