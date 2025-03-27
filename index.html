@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://cdn.firebase.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https://contabilizar.github.io; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com;">
     <title>Avaliação - Contabilizar - {{funcionario}}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5 🙂1/css/all.min.css">
     <style>
         :root {
             --primary: #000051;
@@ -113,7 +113,7 @@
             display: flex; 
             justify-content: center; 
             margin-bottom: calc(var(--spacing-unit) * 1); 
-            direction: ltr; /* Garante que as estrelas sejam preenchidas da esquerda para a direita */
+            direction: ltr; /* Garante que as estrelas sejam exibidas da esquerda para a direita */
         }
         .rating input { 
             display: none; 
@@ -124,17 +124,21 @@
             cursor: pointer; 
             transition: var(--transition); 
         }
-        /* Preenche as estrelas da esquerda para a direita */
+        /* Remove o comportamento anterior de preenchimento */
         .rating input:checked ~ label,
         .rating label:hover,
         .rating label:hover ~ label {
-            color: var(--star-empty-color); /* Reseta as estrelas à direita */
+            color: var(--star-empty-color); /* Reseta todas as estrelas para a cor vazia */
         }
+        /* Preenche apenas as estrelas até a selecionada */
         .rating input:checked + label,
-        .rating input:checked + label ~ label[for*="star"],
+        .rating input:checked + label ~ label[for*="star"]:not(:has(~ input:checked + label)) {
+            color: var(--star-color); /* Preenche até a estrela selecionada */
+        }
+        /* Efeito de hover: preenche até a estrela que o mouse está sobre */
         .rating label:hover,
-        .rating label:hover ~ label[for*="star"] {
-            color: var(--star-color); /* Preenche as estrelas à esquerda */
+        .rating label:hover ~ label:not(:has(~ input:checked + label)) {
+            color: var(--star-color);
         }
         .rating-legend { 
             font-size: 0.8rem; 
