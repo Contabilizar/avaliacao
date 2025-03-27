@@ -107,18 +107,30 @@
             margin-bottom: calc(var(--spacing-unit) * 1); 
             color: var(--primary); 
         }
-        .answer-input { 
-            width: 100%; 
-            padding: calc(var(--spacing-unit) * 0.75); 
-            border: 1px solid var(--secondary); 
-            border-radius: 0.5rem; 
-            font-size: 1rem; 
+        .rating { 
+            display: flex; 
+            justify-content: center; 
             margin-bottom: calc(var(--spacing-unit) * 1); 
+        }
+        .rating input { 
+            display: none; 
+        }
+        .rating label { 
+            font-size: 2rem; 
+            color: var(--secondary); 
+            cursor: pointer; 
             transition: var(--transition); 
         }
-        .answer-input:focus { 
-            border-color: var(--primary); 
-            outline: none; 
+        .rating label:hover,
+        .rating input:checked ~ label,
+        .rating label:hover ~ label { 
+            color: #f1c40f; 
+        }
+        .rating-legend { 
+            font-size: 0.8rem; 
+            color: #4b5563; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            line-height: 1.2; 
         }
         .carousel-nav { 
             display: flex; 
@@ -178,25 +190,6 @@
         }
         .rating-section { 
             display: none; 
-        }
-        .rating { 
-            display: flex; 
-            justify-content: center; 
-            margin-bottom: calc(var(--spacing-unit) * 2); 
-        }
-        .rating input { 
-            display: none; 
-        }
-        .rating label { 
-            font-size: 2rem; 
-            color: var(--secondary); 
-            cursor: pointer; 
-            transition: var(--transition); 
-        }
-        .rating label:hover,
-        .rating input:checked ~ label,
-        .rating label:hover ~ label { 
-            color: #f1c40f; 
         }
         textarea { 
             width: 100%; 
@@ -271,10 +264,11 @@
                 font-size: 1rem;
                 margin-bottom: calc(var(--spacing-unit) * 0.75);
             }
-            .answer-input { 
-                font-size: 0.9rem;
-                padding: calc(var(--spacing-unit) * 0.5);
-                margin-bottom: calc(var(--spacing-unit) * 0.75);
+            .rating label { 
+                font-size: 1.5rem;
+            }
+            .rating-legend { 
+                font-size: 0.7rem;
             }
             .carousel-nav { 
                 gap: 0.5rem;
@@ -285,9 +279,6 @@
             }
             .rating-section h3 { 
                 font-size: 1rem;
-            }
-            .rating label { 
-                font-size: 1.5rem;
             }
             textarea { 
                 height: 80px;
@@ -337,23 +328,58 @@
             <div class="carousel-slides" id="carouselSlides">
                 <div class="carousel-slide">
                     <h3>O seu problema foi resolvido de forma satisfatória?</h3>
-                    <input type="text" class="answer-input" id="q1" placeholder="Digite sua resposta">
+                    <div class="rating" id="q1-rating">
+                        <input type="radio" id="q1-star5" name="q1" value="5"><label for="q1-star5">★</label>
+                        <input type="radio" id="q1-star4" name="q1" value="4"><label for="q1-star4">★</label>
+                        <input type="radio" id="q1-star3" name="q1" value="3"><label for="q1-star3">★</label>
+                        <input type="radio" id="q1-star2" name="q1" value="2"><label for="q1-star2">★</label>
+                        <input type="radio" id="q1-star1" name="q1" value="1"><label for="q1-star1">★</label>
+                    </div>
+                    <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
                 </div>
                 <div class="carousel-slide">
                     <h3>A solução foi entregue em um tempo adequado?</h3>
-                    <input type="text" class="answer-input" id="q2" placeholder="Digite sua resposta">
+                    <div class="rating" id="q2-rating">
+                        <input type="radio" id="q2-star5" name="q2" value="5"><label for="q2-star5">★</label>
+                        <input type="radio" id="q2-star4" name="q2" value="4"><label for="q2-star4">★</label>
+                        <input type="radio" id="q2-star3" name="q2" value="3"><label for="q2-star3">★</label>
+                        <input type="radio" id="q2-star2" name="q2" value="2"><label for="q2-star2">★</label>
+                        <input type="radio" id="q2-star1" name="q2" value="1"><label for="q2-star1">★</label>
+                    </div>
+                    <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
                 </div>
                 <div class="carousel-slide">
                     <h3>O retorno do atendente foi rápido e eficiente?</h3>
-                    <input type="text" class="answer-input" id="q3" placeholder="Digite sua resposta">
+                    <div class="rating" id="q3-rating">
+                        <input type="radio" id="q3-star5" name="q3" value="5"><label for="q3-star5">★</label>
+                        <input type="radio" id="q3-star4" name="q3" value="4"><label for="q3-star4">★</label>
+                        <input type="radio" id="q3-star3" name="q3" value="3"><label for="q3-star3">★</label>
+                        <input type="radio" id="q3-star2" name="q3" value="2"><label for="q3-star2">★</label>
+                        <input type="radio" id="q3-star1" name="q3" value="1"><label for="q3-star1">★</label>
+                    </div>
+                    <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
                 </div>
                 <div class="carousel-slide">
                     <h3>O atendimento foi cordial e respeitoso?</h3>
-                    <input type="text" class="answer-input" id="q4" placeholder="Digite sua resposta">
+                    <div class="rating" id="q4-rating">
+                        <input type="radio" id="q4-star5" name="q4" value="5"><label for="q4-star5">★</label>
+                        <input type="radio" id="q4-star4" name="q4" value="4"><label for="q4-star4">★</label>
+                        <input type="radio" id="q4-star3" name="q4" value="3"><label for="q4-star3">★</label>
+                        <input type="radio" id="q4-star2" name="q4" value="2"><label for="q4-star2">★</label>
+                        <input type="radio" id="q4-star1" name="q4" value="1"><label for="q4-star1">★</label>
+                    </div>
+                    <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
                 </div>
                 <div class="carousel-slide">
                     <h3>O atendente demonstrou conhecimento para resolver sua solicitação?</h3>
-                    <input type="text" class="answer-input" id="q5" placeholder="Digite sua resposta">
+                    <div class="rating" id="q5-rating">
+                        <input type="radio" id="q5-star5" name="q5" value="5"><label for="q5-star5">★</label>
+                        <input type="radio" id="q5-star4" name="q5" value="4"><label for="q5-star4">★</label>
+                        <input type="radio" id="q5-star3" name="q5" value="3"><label for="q5-star3">★</label>
+                        <input type="radio" id="q5-star2" name="q5" value="2"><label for="q5-star2">★</label>
+                        <input type="radio" id="q5-star1" name="q5" value="1"><label for="q5-star1">★</label>
+                    </div>
+                    <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
                 </div>
                 <!-- Slide de Agradecimento -->
                 <div class="carousel-slide thank-you-slide">
@@ -379,6 +405,7 @@
                 <input type="radio" id="star2" name="nota" value="2"><label for="star2">★</label>
                 <input type="radio" id="star1" name="nota" value="1"><label for="star1">★</label>
             </div>
+            <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
             <textarea id="comentario" placeholder="Deixe seu comentário (opcional)"></textarea>
             <button id="submitBtn">Enviar Avaliação</button>
             <p class="success" id="successMsg">Avaliação enviada com sucesso!</p>
@@ -461,20 +488,22 @@
                 return true;
             }
             const slide = slides[slideIndex];
-            const input = slide.querySelector('.answer-input');
-            const answered = input.value.trim() !== '';
+            const ratingInputs = slide.querySelectorAll(`input[name="q${slideIndex + 1}"]`);
+            const answered = Array.from(ratingInputs).some(input => input.checked);
             console.log(`Pergunta ${slideIndex + 1} respondida: ${answered}`);
             return answered;
         }
 
         slides.forEach((slide, index) => {
             if (index === slides.length - 1) return;
-            const input = slide.querySelector('.answer-input');
-            input.addEventListener('input', () => {
-                if (currentSlide === index) {
-                    console.log(`Input na pergunta ${index + 1}. Resposta: ${input.value}`);
-                    nextBtn.disabled = !isSlideAnswered(currentSlide);
-                }
+            const ratingInputs = slide.querySelectorAll(`input[name="q${index + 1}"]`);
+            ratingInputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    if (currentSlide === index) {
+                        console.log(`Estrela selecionada na pergunta ${index + 1}. Valor: ${input.value}`);
+                        nextBtn.disabled = !isSlideAnswered(currentSlide);
+                    }
+                });
             });
         });
 
@@ -502,7 +531,8 @@
             console.log("Clicou em Avaliar Novamente. Reiniciando carrossel.");
             currentSlide = 0;
             for (let i = 1; i <= 5; i++) {
-                document.getElementById(`q${i}`).value = '';
+                const ratingInputs = document.querySelectorAll(`input[name="q${i}"]`);
+                ratingInputs.forEach(input => input.checked = false);
             }
             updateCarousel();
         });
@@ -521,8 +551,8 @@
 
             const respostas = {};
             for (let i = 1; i <= 5; i++) {
-                const resposta = document.getElementById(`q${i}`).value.trim();
-                respostas[`pergunta${i}`] = resposta || '';
+                const resposta = document.querySelector(`input[name="q${i}"]:checked`)?.value || '';
+                respostas[`pergunta${i}`] = parseInt(resposta) || 0;
             }
 
             if (!nota) {
@@ -541,7 +571,6 @@
             try {
                 console.log("Enviando avaliação para o Firebase...");
                 const evaluationId = `avaliacao_${Date.now()}`;
-                // Caminho ajustado: avaliacoes/empresa/funcionario/avaliacaoId
                 const docRef = doc(db, "avaliacoes", empresa, funcionarioId, evaluationId);
                 await setDoc(docRef, avaliacao);
                 console.log("Avaliação salva com sucesso!");
