@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://cdn.firebase.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https://contabilizar.github.io; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com;">
     <title>Avaliação - Contabilizar - {{funcionario}}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5 🙂1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
             --primary: #000051;
@@ -16,8 +16,6 @@
             --spacing-unit: 1rem;
             --border-radius: 1.5rem;
             --header-height: 80px;
-            --star-color: #f1c40f; /* Cor das estrelas preenchidas */
-            --star-empty-color: #e5e5e5; /* Cor das estrelas vazias */
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -120,42 +118,32 @@
         }
         .rating label { 
             font-size: 2rem; 
-            color: var(--star-empty-color); /* Estrelas vazias */
+            color: var(--secondary); /* Estrelas vazias */
             cursor: pointer; 
             transition: var(--transition); 
         }
         /* Remove o comportamento anterior de preenchimento */
-        .rating input:checked ~ label,
         .rating label:hover,
-        .rating label:hover ~ label {
-            color: var(--star-empty-color); /* Reseta todas as estrelas para a cor vazia */
+        .rating input:checked ~ label,
+        .rating label:hover ~ label { 
+            color: var(--secondary); /* Reseta todas as estrelas para a cor vazia */
         }
         /* Preenche apenas as estrelas até a selecionada */
         .rating input:checked + label,
         .rating input:checked + label ~ label[for*="star"]:not(:has(~ input:checked + label)) {
-            color: var(--star-color); /* Preenche até a estrela selecionada */
+            color: #f1c40f; /* Preenche até a estrela selecionada */
         }
         /* Efeito de hover: preenche até a estrela que o mouse está sobre */
         .rating label:hover,
         .rating label:hover ~ label:not(:has(~ input:checked + label)) {
-            color: var(--star-color);
+            color: #f1c40f;
         }
         .rating-legend { 
             font-size: 0.8rem; 
-            margin-top: 0.5rem; 
-            display: none; /* Inicialmente escondido */
-            text-align: center; 
-            transition: opacity 0.3s ease; 
+            color: #4b5563; 
+            margin-bottom: calc(var(--spacing-unit) * 1); 
+            line-height: 1.2; 
         }
-        .rating-legend.show { 
-            display: block; 
-            opacity: 1; 
-        }
-        .rating-legend.very-bad { color: #e74c3c; } /* Vermelho para Muito ruim */
-        .rating-legend.bad { color: #e67e22; } /* Laranja para Ruim */
-        .rating-legend.average { color: #f1c40f; } /* Amarelo para Mediano */
-        .rating-legend.good { color: #2ecc71; } /* Verde claro para Bom */
-        .rating-legend.very-good { color: #27ae60; } /* Verde escuro para Muito bom */
         .carousel-nav { 
             display: flex; 
             justify-content: center; 
@@ -359,7 +347,7 @@
                         <input type="radio" id="q1-star4" name="q1" value="4"><label for="q1-star4">★</label>
                         <input type="radio" id="q1-star5" name="q1" value="5"><label for="q1-star5">★</label>
                     </div>
-                    <p class="rating-legend" id="q1-legend"></p>
+                    <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
                 </div>
                 <div class="carousel-slide">
                     <h3>A solução foi entregue em um tempo adequado?</h3>
@@ -370,7 +358,7 @@
                         <input type="radio" id="q2-star4" name="q2" value="4"><label for="q2-star4">★</label>
                         <input type="radio" id="q2-star5" name="q2" value="5"><label for="q2-star5">★</label>
                     </div>
-                    <p class="rating-legend" id="q2-legend"></p>
+                    <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
                 </div>
                 <div class="carousel-slide">
                     <h3>O retorno do atendente foi rápido e eficiente?</h3>
@@ -381,7 +369,7 @@
                         <input type="radio" id="q3-star4" name="q3" value="4"><label for="q3-star4">★</label>
                         <input type="radio" id="q3-star5" name="q3" value="5"><label for="q3-star5">★</label>
                     </div>
-                    <p class="rating-legend" id="q3-legend"></p>
+                    <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
                 </div>
                 <div class="carousel-slide">
                     <h3>O atendimento foi cordial e respeitoso?</h3>
@@ -392,7 +380,7 @@
                         <input type="radio" id="q4-star4" name="q4" value="4"><label for="q4-star4">★</label>
                         <input type="radio" id="q4-star5" name="q4" value="5"><label for="q4-star5">★</label>
                     </div>
-                    <p class="rating-legend" id="q4-legend"></p>
+                    <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
                 </div>
                 <div class="carousel-slide">
                     <h3>O atendente demonstrou conhecimento para resolver sua solicitação?</h3>
@@ -403,7 +391,7 @@
                         <input type="radio" id="q5-star4" name="q5" value="4"><label for="q5-star4">★</label>
                         <input type="radio" id="q5-star5" name="q5" value="5"><label for="q5-star5">★</label>
                     </div>
-                    <p class="rating-legend" id="q5-legend"></p>
+                    <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
                 </div>
                 <!-- Slide de Agradecimento -->
                 <div class="carousel-slide thank-you-slide">
@@ -429,7 +417,7 @@
                 <input type="radio" id="star4" name="nota" value="4"><label for="star4">★</label>
                 <input type="radio" id="star5" name="nota" value="5"><label for="star5">★</label>
             </div>
-            <p class="rating-legend" id="final-legend"></p>
+            <p class="rating-legend">1 - Muito ruim | 2 - Ruim | 3 - Mediano | 4 - Bom | 5 - Muito bom</p>
             <textarea id="comentario" placeholder="Deixe seu comentário (opcional)"></textarea>
             <button id="submitBtn">Enviar Avaliação</button>
             <p class="success" id="successMsg">Avaliação enviada com sucesso!</p>
@@ -487,15 +475,6 @@
         const restartBtn = document.getElementById('restartBtn');
         let currentSlide = 0;
 
-        // Mapeamento de valores para legendas
-        const ratingLabels = {
-            1: { text: 'Muito ruim', class: 'very-bad' },
-            2: { text: 'Ruim', class: 'bad' },
-            3: { text: 'Mediano', class: 'average' },
-            4: { text: 'Bom', class: 'good' },
-            5: { text: 'Muito bom', class: 'very-good' }
-        };
-
         function updateCarousel() {
             console.log(`Atualizando carrossel. Slide atual: ${currentSlide}`);
             slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
@@ -527,62 +506,16 @@
             return answered;
         }
 
-        function updateLegend(slideIndex, value) {
-            const legend = document.getElementById(`q${slideIndex + 1}-legend`);
-            console.log(`Atualizando legenda para slide ${slideIndex + 1}. Valor: ${value}`);
-            if (legend) {
-                if (value && ratingLabels[value]) {
-                    console.log(`Exibindo legenda: ${ratingLabels[value].text} com classe ${ratingLabels[value].class}`);
-                    legend.textContent = ratingLabels[value].text;
-                    legend.className = `rating-legend ${ratingLabels[value].class} show`;
-                } else {
-                    console.log("Escondendo legenda.");
-                    legend.textContent = '';
-                    legend.className = 'rating-legend';
-                }
-            } else {
-                console.error(`Elemento com ID q${slideIndex + 1}-legend não encontrado.`);
-            }
-        }
-
-        function updateFinalLegend(value) {
-            const legend = document.getElementById('final-legend');
-            console.log(`Atualizando legenda final. Valor: ${value}`);
-            if (legend) {
-                if (value && ratingLabels[value]) {
-                    console.log(`Exibindo legenda final: ${ratingLabels[value].text} com classe ${ratingLabels[value].class}`);
-                    legend.textContent = ratingLabels[value].text;
-                    legend.className = `rating-legend ${ratingLabels[value].class} show`;
-                } else {
-                    console.log("Escondendo legenda final.");
-                    legend.textContent = '';
-                    legend.className = 'rating-legend';
-                }
-            } else {
-                console.error("Elemento com ID final-legend não encontrado.");
-            }
-        }
-
         slides.forEach((slide, index) => {
-            if (index === slides.length - 1) return; // Ignora o slide de agradecimento
+            if (index === slides.length - 1) return;
             const ratingInputs = slide.querySelectorAll(`input[name="q${index + 1}"]`);
             ratingInputs.forEach(input => {
                 input.addEventListener('change', () => {
-                    console.log(`Evento change disparado na pergunta ${index + 1}. Valor: ${input.value}`);
                     if (currentSlide === index) {
+                        console.log(`Estrela selecionada na pergunta ${index + 1}. Valor: ${input.value}`);
                         nextBtn.disabled = !isSlideAnswered(currentSlide);
-                        updateLegend(index, input.value);
                     }
                 });
-            });
-        });
-
-        // Adiciona evento para a seção de avaliação final
-        const finalRatingInputs = document.querySelectorAll('input[name="nota"]');
-        finalRatingInputs.forEach(input => {
-            input.addEventListener('change', () => {
-                console.log(`Evento change disparado na avaliação final. Valor: ${input.value}`);
-                updateFinalLegend(input.value);
             });
         });
 
@@ -612,7 +545,6 @@
             for (let i = 1; i <= 5; i++) {
                 const ratingInputs = document.querySelectorAll(`input[name="q${i}"]`);
                 ratingInputs.forEach(input => input.checked = false);
-                updateLegend(i - 1, null); // Esconde a legenda
             }
             updateCarousel();
         });
@@ -666,7 +598,6 @@
                     ratingSection.style.display = 'none';
                     carousel.style.display = 'block';
                     currentSlide = slides.length - 1;
-                    updateFinalLegend(null); // Esconde a legenda da avaliação final
                     updateCarousel();
                 }, 2000);
             } catch (error) {
