@@ -477,7 +477,12 @@
                 return;
             }
 
-            const link = `https://contabilizar.github.io/avaliacao/${userId}.html?cliente=${clienteId}&empresa=${empresaNome}`;
+            // Codifica os parâmetros para evitar espaços na URL
+            const encodedClienteId = encodeURIComponent(clienteId);
+            const encodedEmpresaNome = encodeURIComponent(empresaNome);
+
+            // Gera o link com os parâmetros codificados
+            const link = `https://contabilizar.github.io/avaliacao/${userId}.html?cliente=${encodedClienteId}&empresa=${encodedEmpresaNome}`;
             const linkOutput = document.getElementById('linkOutput');
             linkOutput.innerHTML = `
                 <button id="copyButton" onclick="copyLink('${link}')">Copiar Link</button>
