@@ -268,7 +268,7 @@
                 <option value="">Selecione um Cliente</option>
             </select>
             <button id="gerarLinkBtn" disabled onclick="gerarLink()">Gerar Link</button>
-            <div id="linkOutput"></div>
+            $(<div id="linkOutput"></div>
         </div>
     </div>
 
@@ -310,9 +310,9 @@
         // Função para normalizar o nome da empresa para o ID
         function normalizeEmpresaId(empresaNome) {
             return empresaNome
-                .replace(/[^a-zA-Z0-9]/g, '') // Remove caracteres especiais
-                .replace(/\s+/g, '') // Remove espaços
-                .toUpperCase(); // Converte para letras maiúsculas
+                .replace(/[^a-zA-Z0-9]/g, '')
+                .replace(/\s+/g, '')
+                .toUpperCase();
         }
 
         // Função para carregar todas as empresas
@@ -330,7 +330,6 @@
                 const empresaNome = empresaDoc.data().nome;
                 empresas.push({ id: empresaId, nome: empresaNome });
 
-                // Carrega os clientes dessa empresa
                 const clientesQuery = query(collection(db, `clientes/${empresaId}/clientes`), orderBy('nome'));
                 const clientesSnapshot = await getDocs(clientesQuery);
                 clientesPorEmpresa[empresaId] = [];
@@ -347,7 +346,6 @@
                 empresaSelect.appendChild(option);
             }
 
-            // Atualiza o dropdown com base no filtro de busca
             filtrarEmpresasEClientes();
         }
 
@@ -381,7 +379,6 @@
             const clienteSelect = document.getElementById('clienteSelect');
             const selectedEmpresa = empresaSelect.value;
 
-            // Filtra as empresas
             empresaSelect.innerHTML = '<option value="">Selecione uma Empresa</option>';
             const empresasFiltradas = empresas.filter(empresa => 
                 empresa.nome.toLowerCase().includes(searchTerm) ||
@@ -399,7 +396,6 @@
                 empresaSelect.appendChild(option);
             });
 
-            // Atualiza os clientes com base na empresa selecionada e no filtro
             carregarClientes(selectedEmpresa);
         }
 
@@ -422,8 +418,8 @@
         function esconderCampoBusca() {
             const searchContainer = document.getElementById('searchContainer');
             searchContainer.style.display = 'none';
-            document.getElementById('searchInput').value = ''; // Limpa o campo de busca
-            filtrarEmpresasEClientes(); // Restaura a lista completa
+            document.getElementById('searchInput').value = '';
+            filtrarEmpresasEClientes();
         }
 
         // Função para cadastrar um novo cliente
@@ -438,19 +434,16 @@
             }
 
             try {
-                // Verifica se a empresa já existe na coleção 'clientes'
                 const empresaRef = doc(db, 'clientes', empresaNome);
                 const empresaDoc = await getDoc(empresaRef);
 
                 if (!empresaDoc.exists()) {
-                    // Cria o documento da empresa na coleção 'clientes'
                     await setDoc(empresaRef, {
                         nome: empresaNome,
                         criadoPor: userId,
                         dataCriacao: serverTimestamp()
                     });
 
-                    // Cria o documento na coleção 'empresas'
                     const empresaId = normalizeEmpresaId(empresaNome);
                     const empresaRefEmpresas = doc(db, 'empresas', empresaId);
                     await setDoc(empresaRefEmpresas, {
@@ -460,7 +453,6 @@
                     });
                 }
 
-                // Adiciona o cliente na subcoleção "clientes" da empresa
                 const clienteRef = doc(db, `clientes/${empresaNome}/clientes`, clienteNome);
                 await setDoc(clienteRef, {
                     nome: clienteNome,
@@ -481,8 +473,13 @@
             }
         };
 
+        // Função para gerar um token único
+        function gerarTokenUnico() {
+            return 'token_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
         // Função para gerar o link
-        window.gerarLink = function () {
+        window.gerarLink = async function () {
             const empresaSelect = document.getElementById('empresaSelect');
             const clienteSelect = document.getElementById('clienteSelect');
             const empresaId = empresaSelect.value;
@@ -494,16 +491,30 @@
                 return;
             }
 
-            // Codifica os parâmetros para evitar espaços na URL
             const encodedClienteId = encodeURIComponent(clienteId);
             const encodedEmpresaNome = encodeURIComponent(empresaNome);
+            const token = gerarTokenUnico();
 
-            // Gera o link com os parâmetros codificados
-            const link = `https://contabilizar.github.io/avaliacao/${userId}.html?cliente=${encodedClienteId}&empresa=${encodedEmpresaNome}`;
-            const linkOutput = document.getElementById('linkOutput');
-            linkOutput.innerHTML = `
-                <button id="copyButton" onclick="copyLink('${link}')">Copiar Link</button>
-            `;
+            // Salva o token no Firestore
+            try {
+                const tokenRef = doc(db, 'tokens', token);
+                await setDoc(tokenRef, {
+                    cliente: clienteId,
+                    empresa: empresaNome,
+                    funcionario: userId,
+                    usado: false,
+                    dataCriacao: serverTimestamp()
+                });
+
+                const link = `https://contabilizar.github.io/avaliacao/${userId}.html?cliente=${encodedClienteId}&empresa=${encodedEmpresaNome}&token=${token}`;
+                const linkOutput = document.getElementById('linkOutput');
+                linkOutput.innerHTML = `
+                    <button id="copyButton" onclick="copyLink('${link}')">Copiar Link</button>
+                `;
+            } catch (error) {
+                console.error('Erro ao gerar token:', error);
+                alert('Erro ao gerar o link. Tente novamente.');
+            }
         };
 
         // Função para copiar o link

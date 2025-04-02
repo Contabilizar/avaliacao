@@ -130,10 +130,9 @@
             transition: var(--transition); 
             padding: 0 5px; 
         }
-        /* Efeito de hover: preenche até a estrela que o mouse está sobre */
         .rating label:hover,
         .rating label:hover ~ label {
-            color: var(--star-empty-color); /* Reseta as estrelas à direita */
+            color: var(--star-empty-color);
         }
         .rating label:hover,
         .rating label:has(~ label:hover) {
@@ -145,10 +144,9 @@
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
-        /* Preenchimento das estrelas até a selecionada */
         .rating input:checked + label,
         .rating input:checked + label ~ label {
-            color: var(--star-empty-color); /* Reseta as estrelas à direita */
+            color: var(--star-empty-color);
         }
         .rating input:checked + label,
         .rating label:has(~ input:checked) {
@@ -445,7 +443,7 @@
     <script type="module">
         // Importa os módulos do Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-        import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
         // Configuração do Firebase
         const firebaseConfig = {
@@ -472,14 +470,16 @@
             return urlParams.get(param);
         }
 
-        // Obtém os parâmetros cliente e empresa da URL
+        // Obtém os parâmetros cliente, empresa e token da URL
         const clienteId = getQueryParam('cliente');
         const empresa = normalizarNome(getQueryParam('empresa'));
+        const token = getQueryParam('token');
 
         // Valida se os parâmetros estão presentes
-        if (!clienteId || !empresa) {
-            alert('Erro: Cliente ou empresa não especificados na URL. Por favor, contate o administrador.');
-            throw new Error('Cliente ou empresa não especificados na URL');
+        if (!clienteId || !empresa || !token) {
+            alert('Erro: Link inválido ou incompleto. Contate o administrador.');
+            document.body.innerHTML = '<h1>Link Inválido</h1><p>Por favor, use um link válido fornecido pelo funcionário.</p>';
+            throw new Error('Parâmetros inválidos na URL');
         }
 
         // Lógica do Carrossel
@@ -643,12 +643,36 @@
             };
 
             try {
+                // Verifica o token
+                const tokenRef = doc(db, 'tokens', token);
+                const tokenDoc = await getDoc(tokenRef);
+
+                if (!tokenDoc.exists()) {
+                    alert('Link inválido ou expirado.');
+                    return;
+                }
+
+                const tokenData = tokenDoc.data();
+                if (tokenData.usado) {
+                    alert('Este link já foi utilizado para uma avaliação.');
+                    return;
+                }
+
+                if (tokenData.cliente !== clienteId || tokenData.empresa !== empresa || tokenData.funcionario !== funcionarioId) {
+                    alert('Link inválido para este cliente, empresa ou funcionário.');
+                    return;
+                }
+
+                // Salva a avaliação
                 console.log("Enviando avaliação para o Firebase...");
                 const evaluationId = `avaliacao_${Date.now()}`;
                 const docRef = doc(db, "avaliacoes", empresa, funcionarioId, evaluationId);
                 await setDoc(docRef, avaliacao);
-                console.log("Avaliação salva com sucesso!");
 
+                // Marca o token como usado
+                await updateDoc(tokenRef, { usado: true });
+
+                console.log("Avaliação salva com sucesso!");
                 document.getElementById('submitBtn').disabled = true;
                 successMsg.style.display = 'block';
 
@@ -660,7 +684,7 @@
                     ratingSection.style.display = 'none';
                     carousel.style.display = 'block';
                     currentSlide = slides.length - 1;
-                    updateFinalLegend(null); // Esconde a legenda da avaliação final
+                    updateFinalLegend(null);
                     updateCarousel();
                 }, 2000);
             } catch (error) {
