@@ -50,6 +50,12 @@
     const ratingSection = document.getElementById('ratingSection');
     let currentSlide = 0;
 
+    // Verifica se os elementos existem
+    console.log('slides:', slides.length);
+    console.log('slidesContainer:', slidesContainer);
+    console.log('carousel:', carousel);
+    console.log('ratingSection:', ratingSection);
+
     // Mapeamento de valores para legendas
     const ratingLabels = {
         1: { text: 'Muito ruim', class: 'very-bad' },
@@ -61,6 +67,10 @@
 
     function updateCarousel() {
         console.log(`Atualizando carrossel. Slide atual: ${currentSlide}/${slides.length - 1}`);
+        if (!slidesContainer) {
+            console.error('slidesContainer não encontrado!');
+            return;
+        }
         slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
         prevBtn.disabled = currentSlide === 0;
         nextBtn.disabled = !isSlideAnswered(currentSlide);
@@ -163,7 +173,7 @@
     document.getElementById('submitBtn').addEventListener('click', async (e) => {
         e.preventDefault();
         console.log("Botão de envio clicado.");
-        
+
         const nota = document.querySelector('input[name="nota"]:checked')?.value;
         const comentario = document.getElementById('comentario').value;
 
@@ -227,21 +237,26 @@
             document.getElementById('submitBtn').disabled = true;
             successMsg.style.display = 'block';
 
-            // Após 2 segundos, exibe o slide de agradecimento
+            // Após 2 segundos, força a exibição do slide de agradecimento
             setTimeout(() => {
-                console.log("Tentando mostrar o slide de agradecimento...");
+                console.log("Executando transição para o slide de agradecimento...");
+                if (!carousel || !ratingSection) {
+                    console.error("carousel ou ratingSection não encontrados!");
+                    return;
+                }
                 successMsg.style.display = 'none';
                 form.reset(); // Reseta o formulário
                 document.getElementById('submitBtn').disabled = false;
                 ratingSection.style.display = 'none'; // Esconde a seção de avaliação
                 carousel.style.display = 'block'; // Mostra o carrossel
                 currentSlide = slides.length - 1; // Define o slide de agradecimento
-                updateCarousel(); // Atualiza o carrossel para exibir o slide correto
+                console.log(`Definindo currentSlide para ${currentSlide}`);
+                updateCarousel(); // Atualiza o carrossel
             }, 2000);
         } catch (error) {
             console.error("Erro ao salvar a avaliação:", error);
             alert('Erro ao enviar a avaliação. Tente novamente.');
-            document.getElementById('submitBtn').disabled = false; // Reativa o botão em caso de erro
+            document.getElementById('submitBtn').disabled = false;
         }
     });
 </script>
