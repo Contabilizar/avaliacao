@@ -502,12 +502,15 @@
         };
 
         function updateCarousel() {
+            console.log(`Atualizando carrossel. Slide atual: ${currentSlide}`);
             slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
             prevBtn.disabled = currentSlide === 0;
             nextBtn.disabled = !isSlideAnswered(currentSlide);
             if (currentSlide === slides.length - 1) {
+                console.log("Exibindo slide de agradecimento. Escondendo navegação.");
                 carouselNav.classList.add('hidden');
             } else {
+                console.log("Mostrando navegação.");
                 carouselNav.classList.remove('hidden');
                 if (currentSlide === slides.length - 2 && isSlideAnswered(currentSlide)) {
                     nextBtn.textContent = 'Finalizar';
@@ -518,35 +521,50 @@
         }
 
         function isSlideAnswered(slideIndex) {
-            if (slideIndex === slides.length - 1) return true; // Slide de agradecimento
+            if (slideIndex === slides.length - 1) {
+                console.log("Slide de agradecimento, não precisa de resposta.");
+                return true;
+            }
             const slide = slides[slideIndex];
             const ratingInputs = slide.querySelectorAll(`input[name="q${slideIndex + 1}"]`);
-            return Array.from(ratingInputs).some(input => input.checked);
+            const answered = Array.from(ratingInputs).some(input => input.checked);
+            console.log(`Pergunta ${slideIndex + 1} respondida: ${answered}`);
+            return answered;
         }
 
         function updateLegend(slideIndex, value) {
             const legend = document.getElementById(`q${slideIndex + 1}-legend`);
+            console.log(`Atualizando legenda para slide ${slideIndex + 1}. Valor: ${value}`);
             if (legend) {
                 if (value && ratingLabels[value]) {
+                    console.log(`Exibindo legenda: ${ratingLabels[value].text} com classe ${ratingLabels[value].class}`);
                     legend.textContent = ratingLabels[value].text;
                     legend.className = `rating-legend ${ratingLabels[value].class} show`;
                 } else {
+                    console.log("Escondendo legenda.");
                     legend.textContent = '';
                     legend.className = 'rating-legend';
                 }
+            } else {
+                console.error(`Elemento com ID q${slideIndex + 1}-legend não encontrado.`);
             }
         }
 
         function updateFinalLegend(value) {
             const legend = document.getElementById('final-legend');
+            console.log(`Atualizando legenda final. Valor: ${value}`);
             if (legend) {
                 if (value && ratingLabels[value]) {
+                    console.log(`Exibindo legenda final: ${ratingLabels[value].text} com classe ${ratingLabels[value].class}`);
                     legend.textContent = ratingLabels[value].text;
                     legend.className = `rating-legend ${ratingLabels[value].class} show`;
                 } else {
+                    console.log("Escondendo legenda final.");
                     legend.textContent = '';
                     legend.className = 'rating-legend';
                 }
+            } else {
+                console.error("Elemento com ID final-legend não encontrado.");
             }
         }
 
@@ -555,6 +573,7 @@
             const ratingInputs = slide.querySelectorAll(`input[name="q${index + 1}"]`);
             ratingInputs.forEach(input => {
                 input.addEventListener('change', () => {
+                    console.log(`Evento change disparado na pergunta ${index + 1}. Valor: ${input.value}`);
                     if (currentSlide === index) {
                         nextBtn.disabled = !isSlideAnswered(currentSlide);
                         updateLegend(index, input.value);
@@ -563,9 +582,11 @@
             });
         });
 
+        // Adiciona evento para a seção de avaliação final
         const finalRatingInputs = document.querySelectorAll('input[name="nota"]');
         finalRatingInputs.forEach(input => {
             input.addEventListener('change', () => {
+                console.log(`Evento change disparado na avaliação final. Valor: ${input.value}`);
                 updateFinalLegend(input.value);
             });
         });
@@ -573,6 +594,7 @@
         prevBtn.addEventListener('click', () => {
             if (currentSlide > 0) {
                 currentSlide--;
+                console.log("Clicou em Voltar.");
                 updateCarousel();
             }
         });
@@ -580,8 +602,10 @@
         nextBtn.addEventListener('click', () => {
             if (currentSlide < slides.length - 2) {
                 currentSlide++;
+                console.log("Clicou em Próximo.");
                 updateCarousel();
             } else if (currentSlide === slides.length - 2 && isSlideAnswered(currentSlide)) {
+                console.log("Clicou em Finalizar. Mostrando seção de avaliação.");
                 carousel.style.display = 'none';
                 ratingSection.style.display = 'block';
             }
@@ -615,11 +639,11 @@
                 respostas: respostas,
                 nota: parseInt(nota),
                 comentario: comentario || '',
-                data: serverTimestamp(),
-                token: token // Vincula o token à avaliação
+                data: serverTimestamp()
             };
 
             try {
+                // Verifica o token
                 const tokenRef = doc(db, 'tokens', token);
                 const tokenDoc = await getDoc(tokenRef);
 
@@ -639,15 +663,13 @@
                     return;
                 }
 
-                if (tokenData.usado) {
-                    alert('Este link já foi utilizado para uma avaliação.');
-                    return;
-                }
-
+                // Salva a avaliação
+                console.log("Enviando avaliação para o Firebase...");
                 const evaluationId = `avaliacao_${Date.now()}`;
                 const docRef = doc(db, "avaliacoes", empresa, funcionarioId, evaluationId);
                 await setDoc(docRef, avaliacao);
 
+                // Marca o token como usado
                 await updateDoc(tokenRef, { usado: true });
 
                 console.log("Avaliação salva com sucesso!");
@@ -655,6 +677,7 @@
                 successMsg.style.display = 'block';
 
                 setTimeout(() => {
+                    console.log("Avaliação enviada. Mostrando slide de agradecimento...");
                     form.reset();
                     document.getElementById('submitBtn').disabled = false;
                     successMsg.style.display = 'none';
