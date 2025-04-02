@@ -459,7 +459,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Função para normalizar nomes (remover espaços e caracteres especiais)
+        // Função para normalizar nomes (remover espaços)
         function normalizarNome(nome) {
             return nome.replace(/\s+/g, '');
         }
@@ -653,10 +653,10 @@
                 }
 
                 const tokenData = tokenDoc.data();
-                if (tokenData.usado) {
-                    alert('Este link já foi utilizado para uma avaliação.');
-                    return;
-                }
+                console.log('clienteId:', clienteId);
+                console.log('empresa:', empresa);
+                console.log('funcionarioId:', funcionarioId);
+                console.log('tokenData:', tokenData);
 
                 if (tokenData.cliente !== clienteId || tokenData.empresa !== empresa || tokenData.funcionario !== funcionarioId) {
                     alert('Link inválido para este cliente, empresa ou funcionário.');

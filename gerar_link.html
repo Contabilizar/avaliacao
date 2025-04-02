@@ -268,7 +268,7 @@
                 <option value="">Selecione um Cliente</option>
             </select>
             <button id="gerarLinkBtn" disabled onclick="gerarLink()">Gerar Link</button>
-            $(<div id="linkOutput"></div>
+            <div id="linkOutput"></div>
         </div>
     </div>
 
@@ -306,6 +306,11 @@
         // Variáveis globais para armazenar os dados
         let empresas = [];
         let clientesPorEmpresa = {};
+
+        // Função para normalizar nomes (remover espaços)
+        function normalizarNome(nome) {
+            return nome.replace(/\s+/g, '');
+        }
 
         // Função para normalizar o nome da empresa para o ID
         function normalizeEmpresaId(empresaNome) {
@@ -484,7 +489,8 @@
             const clienteSelect = document.getElementById('clienteSelect');
             const empresaId = empresaSelect.value;
             const clienteId = clienteSelect.value;
-            const empresaNome = empresaSelect.options[empresaSelect.selectedIndex].text;
+            const empresaNomeOriginal = empresaSelect.options[empresaSelect.selectedIndex].text;
+            const empresaNome = normalizarNome(empresaNomeOriginal);
 
             if (!empresaId || !clienteId) {
                 alert('Por favor, selecione uma empresa e um cliente.');
@@ -495,7 +501,6 @@
             const encodedEmpresaNome = encodeURIComponent(empresaNome);
             const token = gerarTokenUnico();
 
-            // Salva o token no Firestore
             try {
                 const tokenRef = doc(db, 'tokens', token);
                 await setDoc(tokenRef, {
