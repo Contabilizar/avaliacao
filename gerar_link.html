@@ -275,7 +275,7 @@
     <script type="module">
         // Importa os módulos do Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-        import { getFirestore, collection, doc, setDoc, getDocs, getDoc, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        import { getFirestore, collection, doc, setDoc, getDocs, getDoc, query, orderBy, where, serverTimestamp, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
         // Configuração do Firebase
         const firebaseConfig = {
@@ -483,7 +483,7 @@
             return 'token_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
-        // Função para gerar o link
+        // Função para gerar o link com limite diário
         window.gerarLink = async function () {
             const empresaSelect = document.getElementById('empresaSelect');
             const clienteSelect = document.getElementById('clienteSelect');
@@ -494,6 +494,19 @@
 
             if (!empresaId || !clienteId) {
                 alert('Por favor, selecione uma empresa e um cliente.');
+                return;
+            }
+
+            // Verifica limite diário
+            const hoje = new Date().toISOString().split('T')[0];
+            const tokensHojeQuery = query(
+                collection(db, 'tokens'),
+                where('funcionario', '==', userId),
+                where('dataCriacao', '>=', Timestamp.fromDate(new Date(hoje)))
+            );
+            const tokensHoje = await getDocs(tokensHojeQuery);
+            if (tokensHoje.size >= 10) { // Limite de 10 links por dia
+                alert('Você atingiu o limite diário de geração de links (10 por dia).');
                 return;
             }
 
@@ -508,7 +521,8 @@
                     empresa: empresaNome,
                     funcionario: userId,
                     usado: false,
-                    dataCriacao: serverTimestamp()
+                    dataCriacao: serverTimestamp(),
+                    contexto: "Avaliação padrão" // Campo opcional para rastrear o motivo
                 });
 
                 const link = `https://contabilizar.github.io/avaliacao/${userId}.html?cliente=${encodedClienteId}&empresa=${encodedEmpresaNome}&token=${token}`;

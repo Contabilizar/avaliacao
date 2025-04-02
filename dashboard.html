@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://cdn.firebase.com https://*.firebaseio.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https://contabilizar.github.io https://firebasestorage.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com;">
     <title>Dashboard - Contabilizar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -24,10 +23,6 @@
             color: var(--primary); 
             line-height: 1.6; 
             padding-top: var(--header-height); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
         }
         .header { 
             position: fixed; 
@@ -73,24 +68,12 @@
             background: #c0392b; 
         }
         .container { 
-            max-width: 450px; 
-            width: 90%; 
-            background: var(--bg-light); 
+            max-width: 1200px; 
+            margin: calc(var(--spacing-unit) * 2) auto; 
             padding: calc(var(--spacing-unit) * 2); 
+            background: var(--bg-light); 
             border-radius: var(--border-radius); 
             box-shadow: var(--shadow); 
-            text-align: center; 
-            margin: 0 auto; 
-        }
-        .user-photo { 
-            width: 80px; 
-            height: 80px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            border: 3px solid var(--primary); 
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
-            margin: 0 auto calc(var(--spacing-unit) * 1) auto; 
-            display: block; 
         }
         .title { 
             font-size: 2rem; 
@@ -100,31 +83,23 @@
             -webkit-background-clip: text; 
             color: transparent; 
         }
-        .subtitle { 
-            font-size: 1rem; 
-            color: #4b5563; 
-            margin-bottom: calc(var(--spacing-unit) * 2); 
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: calc(var(--spacing-unit) * 2); 
         }
-        .menu { 
-            display: flex; 
-            flex-direction: column; 
-            gap: calc(var(--spacing-unit) * 1); 
+        th, td { 
+            padding: calc(var(--spacing-unit) * 0.75); 
+            text-align: left; 
+            border-bottom: 1px solid var(--secondary); 
         }
-        .menu button { 
+        th { 
             background: var(--primary); 
             color: #fff; 
-            padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5); 
-            border: none; 
-            border-radius: 0.5rem; 
-            font-size: 1rem; 
-            cursor: pointer; 
-            transition: var(--transition); 
+            font-weight: 600; 
         }
-        .menu button:hover { 
-            background: #003087; 
-        }
-        .hidden { 
-            display: none; 
+        tr:hover { 
+            background: #f9f9f9; 
         }
         @media (max-width: 767px) {
             :root {
@@ -137,8 +112,8 @@
                 padding-top: 50px;
             }
             .container { 
-                padding: calc(var(--spacing-unit) * 1);
-                width: 95%;
+                width: 95%; 
+                padding: calc(var(--spacing-unit) * 1); 
             }
             .logo { 
                 max-height: 40px;
@@ -150,26 +125,15 @@
                 font-size: 0.85rem;
                 padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
             }
-            .user-photo { 
-                width: 60px; 
-                height: 60px; 
-            }
             .title { 
                 font-size: 1.5rem;
             }
-            .subtitle { 
-                font-size: 0.85rem;
-                margin-bottom: calc(var(--spacing-unit) * 1);
-            }
-            .menu button { 
-                font-size: 0.9rem;
-                padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 1);
+            th, td { 
+                font-size: 0.9rem; 
+                padding: calc(var(--spacing-unit) * 0.5); 
             }
         }
     </style>
-    <!-- Adiciona os scripts do Firebase (versão compatível) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <header class="header">
@@ -181,17 +145,15 @@
         </div>
     </header>
     <div class="container">
-        <img id="userPhoto" class="user-photo" src="" alt="Foto do Funcionário">
-        <h1 class="title">Bem-vindo(a), <span id="welcomeName"></span></h1>
-        <p class="subtitle">Selecione uma opção abaixo</p>
-        <div class="menu">
-            <button onclick="window.location.href='gerar_link.html'">Gerar Link de Avaliação</button>
-            <button id="relatoriosBtn" class="hidden" onclick="window.location.href='relatorios.html'">Relatórios Mensais</button>
-            <button id="configuracoesBtn" class="hidden" onclick="window.location.href='configuracoes.html'">Configurações</button>
-        </div>
+        <h1 class="title">Dashboard de Uso de Avaliações</h1>
+        <div id="relatorioUso"></div>
     </div>
 
-    <script>
+    <script type="module">
+        // Importa os módulos do Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getFirestore, collection, getDocs, query, collectionGroup } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
         // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCNidw_VCAVleo0UxTzVkqQhEYXfshB5tk",
@@ -203,8 +165,8 @@
         };
 
         // Inicializa o Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         // Verifica se o usuário está logado
         const userId = localStorage.getItem('userId');
@@ -217,32 +179,55 @@
 
         // Exibe o nome do usuário
         document.getElementById('userName').textContent = userNome;
-        document.getElementById('welcomeName').textContent = userNome;
 
-        // Carrega a foto do funcionário
-        function carregarFotoFuncionario() {
-            const userDocRef = db.collection('funcionarios').doc(userId);
-            userDocRef.get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        const photoUrl = userData.photo || 'https://via.placeholder.com/80'; // Usa o campo "photo"
-                        document.getElementById('userPhoto').src = photoUrl;
-                    } else {
-                        console.error('Documento do usuário não encontrado no Firestore.');
-                        document.getElementById('userPhoto').src = 'https://via.placeholder.com/80'; // URL padrão
-                    }
-                })
-                .catch((error) => {
-                    console.error('Erro ao carregar foto do funcionário:', error);
-                    document.getElementById('userPhoto').src = 'https://via.placeholder.com/80'; // URL padrão
-                });
-        }
+        // Função para carregar o relatório de uso
+        async function carregarRelatorioUso() {
+            const tokensSnapshot = await getDocs(collection(db, 'tokens'));
+            const relatorio = {};
 
-        // Mostra opções adicionais para administradores
-        if (userCargo === 'administrador') {
-            document.getElementById('relatoriosBtn').classList.remove('hidden');
-            document.getElementById('configuracoesBtn').classList.remove('hidden');
+            tokensSnapshot.forEach(doc => {
+                const data = doc.data();
+                const funcId = data.funcionario;
+                if (!relatorio[funcId]) {
+                    relatorio[funcId] = { gerados: 0, usados: 0, notas: [] };
+                }
+                relatorio[funcId].gerados++;
+                if (data.usado) relatorio[funcId].usados++;
+            });
+
+            const avaliacoesSnapshot = await getDocs(query(collectionGroup(db, 'avaliacoes')));
+            avaliacoesSnapshot.forEach(doc => {
+                const data = doc.data();
+                const funcId = doc.ref.parent.parent.id; // Pega o ID do funcionário no caminho
+                if (relatorio[funcId]) {
+                    relatorio[funcId].notas.push(data.nota);
+                }
+            });
+
+            const tabela = document.createElement('table');
+            tabela.innerHTML = `
+                <tr>
+                    <th>Colaborador</th>
+                    <th>Links Gerados</th>
+                    <th>Links Usados</th>
+                    <th>Taxa de Uso</th>
+                    <th>Média de Notas</th>
+                </tr>
+            `;
+            for (const [funcId, stats] of Object.entries(relatorio)) {
+                const taxaUso = (stats.usados / stats.gerados * 100).toFixed(2);
+                const mediaNotas = stats.notas.length ? (stats.notas.reduce((a, b) => a + b, 0) / stats.notas.length).toFixed(2) : 'N/A';
+                tabela.innerHTML += `
+                    <tr>
+                        <td>${funcId}</td>
+                        <td>${stats.gerados}</td>
+                        <td>${stats.usados}</td>
+                        <td>${taxaUso}%</td>
+                        <td>${mediaNotas}</td>
+                    </tr>
+                `;
+            }
+            document.getElementById('relatorioUso').appendChild(tabela);
         }
 
         // Função de logout
@@ -250,11 +235,11 @@
             localStorage.removeItem('userId');
             localStorage.removeItem('userCargo');
             localStorage.removeItem('userNome');
-            window.location.href = 'login.html';
+            window.location.href = './login.html';
         };
 
-        // Carrega a foto do funcionário ao iniciar a página
-        carregarFotoFuncionario();
+        // Carrega o relatório ao iniciar
+        carregarRelatorioUso();
     </script>
 </body>
 </html>
